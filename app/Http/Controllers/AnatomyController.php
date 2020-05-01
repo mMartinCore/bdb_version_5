@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Officer;
+use App\Corpse;
 use App\Commendation ;
 use App\Catcommendation;
 use Validator;
@@ -139,17 +139,25 @@ class AnatomyController  extends  Controller
     {
 
        $anatomy =Anatomy::findOrFail($id);
-
+       
         if (empty($anatomy)) {
             Session::flash('error','Anatomy  not found');
 
             return redirect(route('anatomies.index'));
         }
-
+        $chech_if_Id_InUse=null;
+        $corpses =Corpse::where('anatomy_id',$id)->get();
+        foreach ($corpses as $corpse) {
+           $chech_if_Id_InUse= $corpse;
+        }
+        
+        if (!empty($chech_if_Id_InUse)) {
+            Session::flash('error','Entity integrity constraints Enforces, Cannot be deleted !');
+            return redirect(route('anatomies.index'));
+        }  
+        
        $anatomy->delete($id);
-
        Session::flash('success','Anatomy  deleted successfully.');
-
-        return redirect(route('anatomies.index'));
+       return redirect(route('anatomies.index'));
     }
 }

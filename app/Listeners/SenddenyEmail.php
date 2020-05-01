@@ -29,7 +29,7 @@ class SenddenyEmail
 
 
         foreach ($event->user as $user) {
-            $this->subject='(Request Denied) Re:'.' Pauper\'s'.' Buruial of '.$event->corpse['name']. ' Corpse picked up on'.' '.$event->corpse['pickupdate'];
+            $this->subject='(Request Denied) Re:'.' Pauper\'s'.' Burial of '.$event->corpse['name']. ' Corpse picked up on'.' '.$event->corpse['pickupdate'];
              $data = array('name' => $user->firstName, 'email' => $user->email,
              'body' => ' Re:'.$event->corpse['name'].' Corpse picked up on '.$event->corpse['pickupdate'].' at '.$event->corpse['location'].' in '.$event->corpse['station'].
              ' Police Area, within '. $event->corpse['division'].' Division. '.'
@@ -39,7 +39,7 @@ class SenddenyEmail
              Mail::send('emails.mail', $data, function($message) use ($data) {
                  $message->to($data['email'])
                      ->subject($this->subject);
-             $message->from('jcfdodsystem@gmail.com');
+             $message->from('jcfdbdsystem@gmail.com');
              }
          );
 

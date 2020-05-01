@@ -258,7 +258,18 @@ class HomeController extends Controller
         $burial_request = $this->burial_request();
         $burial_NotApproved = $this->burial_NotApproved();
         $overThirtyDays =0;
-        $corpses = Corpse::where('pickup_date','!=',null)->get();
+
+
+        $auth_user_div_id= auth()->user()->station->division->id  ;
+        if(!auth()->user()->hasRole('SuperAdmin')){ 
+            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('pickup_date','!=',null)->where('body_status',"Unclaimed")->get();
+         }else{
+            $corpses = Corpse::where('pickup_date','!=',null)->where('body_status',"Unclaimed")->get();
+         }
+
+
+
+      
         foreach ($corpses as $corpse) {
             if ($this->storageday($corpse->pickup_date, $corpse->burial_date) >= 30  && $corpse->burial_date == null ) {
 
@@ -279,11 +290,15 @@ class HomeController extends Controller
 
 
     public function burial_request()
-    {
-        $burial_request = 0;
-        $corpses = Corpse::where('pauper_burial_approved', '=', 'Processing')->get();
+    {      $auth_user_div_id= auth()->user()->station->division->id  ;
+        if(!auth()->user()->hasRole('SuperAdmin')){ 
+            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('pauper_burial_approved', '=', 'Processing')->where('body_status',"Unclaimed")->get();
+         }else{
+            $corpses = Corpse::where('pauper_burial_approved', '=', 'Processing')->where('body_status',"Unclaimed")->get();
+         }
+        $burial_request = 0;     
         foreach ($corpses as $corpse) {
-            $burial_request++;
+            $burial_request++; 
         }
         return $burial_request;
     }
@@ -296,7 +311,14 @@ class HomeController extends Controller
     public function burial_NotApproved()
     {
         $burial_NotApproved = 0;
-        $corpses = Corpse::where('pauper_burial_approved', '=', 'No')->get();
+        $auth_user_div_id= auth()->user()->station->division->id  ;
+        if(!auth()->user()->hasRole('SuperAdmin')){ 
+            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('pauper_burial_approved', '=', 'No')->where('body_status',"Unclaimed")->get();
+         }else{
+            $corpses = Corpse::where('pauper_burial_approved', '=', 'No')->where('body_status',"Unclaimed")->get();
+         }
+
+ 
         foreach ($corpses as $corpse) {
             $burial_NotApproved++;
         }
@@ -306,7 +328,12 @@ class HomeController extends Controller
     public function post_mortem_pending()
     {
         $post_mortem_pending = 0;
-        $corpses = Corpse::where('postmortem_status', '=', 'Pending')->get();
+        $auth_user_div_id= auth()->user()->station->division->id  ;
+        if(!auth()->user()->hasRole('SuperAdmin')){ 
+            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('postmortem_status', '=', 'Pending')->where('body_status',"Unclaimed")->get();
+         }else{
+            $corpses = Corpse::where('postmortem_status', '=', 'Pending')->where('body_status',"Unclaimed")->get();
+         } 
         foreach ($corpses as $corpse) {
             $post_mortem_pending++;
         }
@@ -324,7 +351,7 @@ class HomeController extends Controller
 
     public function divisionOverThirstyDays()
     {
-        $corpses = Corpse::get();
+        $corpses = Corpse::where('body_status',"Unclaimed")->get();
         $overThirtyDays = 0;
         $dataCompact[] = null;
         $div[] = '';
@@ -521,9 +548,9 @@ public function stationOverThirstyDays()
 {
 
     if(!auth()->user()->hasRole('SuperAdmin')){
-        $corpses = Corpse::where('division_id', auth()->user()->station->division->id  )->get();
+        $corpses = Corpse::where('division_id', auth()->user()->station->division->id  )->where('body_status',"Unclaimed")->get();
         }else {
-            $corpses = Corpse::get();
+            $corpses = Corpse::where('body_status',"Unclaimed")->get();
     }
 
     $overThirtyDays = 0;

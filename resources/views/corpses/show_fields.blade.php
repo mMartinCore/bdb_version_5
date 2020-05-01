@@ -106,12 +106,12 @@ function print_div()
                 @if ($corpse->first_name =="Unidentified")
 
                         @if ($corpse->suspected_name!='')
-                             * {{$corpse->suspected_name}} *
+                             * {{ucfirst($corpse->suspected_name)}} *
                         @else
-                        {{$corpse->first_name }}
+                        {{ ucfirst($corpse->first_name) }}
                         @endif
                 @else
-                {{$corpse->first_name .' '.$corpse->middle_name.' '. $corpse->last_name}}
+                {{ ucfirst($corpse->first_name) .' '. ucfirst($corpse->middle_name).' '. ucfirst($corpse->last_name)}}
                 @endif
                 <br>
 
@@ -133,7 +133,7 @@ function print_div()
  <br>
 
 
-            {{Form::label('address', ' Late of Address:') }}
+            {{Form::label('address', ' Late of :') }}
             {{$corpse->address }}
 <br>
 
@@ -286,8 +286,13 @@ function print_div()
         {{Form::label('pathlogist', 'Pathlogist:') }}
         {{$corpse->pathlogist }}<br>
 
-        {{Form::label('cause_of_Death', 'Cause Of Death:') }}
-        {{$corpse->cause_of_Death }}<br>
+        {{Form::label('dna', 'DNA:') }}
+        {{$corpse->getDna->dna }}
+        <br>
+        {{Form::label('dna_date', 'DNA Date:') }}
+        {{$corpse->getDna->dna_request_date }}      
+         <br>
+    
     </div>
 
 
@@ -298,7 +303,7 @@ function print_div()
 
         <div class="form-group">
             {{Form::label('investigator_last_name', 'Investigator:') }}
-            {{$i->regNum  }}    {{$i->rank->rank  }} {{$i->investigator_first_name." ".$i->investigator_last_name  }}
+            {{$i->regNum  }}    {{$i->rank->rank  }} {{ucfirst($i->investigator_first_name)." ".ucfirst($i->investigator_last_name)  }}
             <br>
             {{Form::label('assign_date', 'Assigned Date:') }}
             {{$i->assign_date  }}
@@ -380,7 +385,7 @@ function print_div()
       <b style="color:green; font-size:medium"> 0 </b>
     @endif
 
-</div>
+</div> 
 
 
 
@@ -395,18 +400,17 @@ function print_div()
         {{Form::label('finger_print_date', 'Finger Print Date:') }}
         {{$corpse->finger_print_date }}
         <br>
-            {{Form::label('dna', 'DNA:') }}
-            {{$corpse->dna }}
-            <br>
-            {{Form::label('dna_date', 'DNA Date:') }}
-            {{$corpse->dna_date }}
-            <br>
+    
             {{Form::label('gazetted', 'Gazetted:') }}
             {{$corpse->gazetted }}
             <br>
             {{Form::label('gazetted_date', 'Gazetted Date:') }}
             {{$corpse->gazetted_date }}
             <br>
+            {{Form::label('volume_no', 'Volume #:') }}
+            {{$corpse->volume_no }}
+            <br>
+            
             {{Form::label('pauper_burial_requested', 'Pauper\'s Burial Request :') }}
            
             @if ($corpse->pauper_burial_requested  =='No')
@@ -427,7 +431,7 @@ function print_div()
 
 
             <br>
-            {{Form::label('pauper_burial_requested_date', 'Paupe\'s Burial Request  Date:') }}
+            {{Form::label('pauper_burial_requested_date', 'Pauper\'s Burial Request  Date:') }}
             {{$corpse->pauper_burial_requested_date }}
             <input id="pauper_burial_requested_date" type="hidden" value="{{$corpse->pauper_burial_requested_date }}"><br>
             <b>  <div style="color:darkorange" id="requestTimeAgo"> </div></b>
@@ -469,26 +473,6 @@ function print_div()
 
     </div>
 
-
-
-
-
-
-<!-- User Id Field -->
-<div class="form-group">
-    {{Form::label('created_at', 'Created at:') }}
-    {{ $corpse->created_at->diffForHumans() }} <br>
-
-    {{Form::label('user_id', 'Created by:') }}
-    {{$corpse->user->firstName." ".$corpse->user->lastName }} <br>
-
-    {{Form::label('modified_by', 'Modified by:') }}
-    <?php  $user = App\User::where('users.id',$corpse->modified_by)->get(); ?>
-      @foreach ($user as  $modifedby)
-      {{  $modifedby->firstName." ". $modifedby->lastName}}
-      @endforeach
-</div>
-
 <hr>
 
 
@@ -517,14 +501,15 @@ function print_div()
                    <div class="form-group"> </div>
                     <div class ="messageVacation">
                       <div id="vacationStatusUpdate"  style="color:green;">  </div>
-                      <span class="taskMess"></span>
-                      <h4 id="vacationStatusTxt" > Enter a Task</h4> <span style="color:red" class="task_error"></span>
-                      <input type="text" class="task form-control"name="task" id="task"    ><br>
+                      <span class="taskMess  "></span>
+                      <h4 id="vacationStatusTxt" > Enter a Task </h4> <span style="color:red" class="task_error"></span>
+                      <textarea name="task" id="task"  class=" task form-control"  rows="7" id="message-text"></textarea>
+          
                       </div>
                    <hr>
-               <button id="btnConfirmVacation" class="saved hide_original_submitTask_btn" >Submit</button>  &emsp;
+               <button id="btnConfirmVacation" class="saved hide_original_submitTask_btn" ><i class="fa fa-paper-plane-o" aria-hidden="true"></i> Send</button>  &emsp;
                <button id="btnConfirmVacation" class=" hide_deny_task_btn " onclick="SubmitTask();" >Deny</button>  &emsp;
-               <button id="cancelVacation" onclick=" myFunction()" class = "cancelTask yes">Cancel</button> &emsp;
+               <button id="cancelVacation" onclick=" myFunction()" class = "cancelTask yes"> <i class="fa fa-times-circle" aria-hidden="true"></i>  Cancel</button> &emsp;
           </div>
            <div>
            </div>
@@ -534,12 +519,7 @@ function print_div()
 
      <a href="{{route('corpses.edit', [$corpse->id]) }}" class='btn btn-default btn-sm'><i class="glyphicon glyphicon-edit"></i> Edit</a>
 
-
-
-
-
-
-
+     
 
 
 
@@ -554,7 +534,9 @@ function print_div()
         $(document).ready(function() {
             
             $(".task").val('');
-            getTasks($("#corpse_id").val());
+            getTasks($("#corpse_id").val());  
+            getAllMessages($("#corpse_id").val()); 
+            getSummary($("#corpse_id").val()); 
             if ($("#pauper_burial_requested_date").val()!='' && $("#pauper_burial_approved").val()=='Processing') {
              //   var since= 'Processing '+timeAgo($("#pauper_burial_requested_date").val());
               //  $("#requestTimeAgo").html(since);
@@ -570,14 +552,14 @@ function print_div()
 
 
 
-        $(".saved").click(function(){
+        $(".saved").click(function(){ 
             $(".taskMess").html('');
             var taskx = $(".task").val();
             if(taskx==''){
                 $(".task_error").text("NO TASK ENTERED!");
                  $(".task").css("border","2px solid red");
 
-            }else  if(taskx.length > 150){
+            }else  if(taskx.length > 500){
                     $(".task").css("border","2px solid red");;
                     $(".task_error").html("TASK  IS TOO WORDY!");
             }else if( taskx.length !=null && taskx.length < 7){
@@ -599,6 +581,13 @@ function print_div()
 
 
 
+
+
+
+
+
+          
+
    $(".modal_Vacation_close").click(function()
          {
            $(".my_Modal_Vacation").hide();
@@ -619,7 +608,13 @@ function print_div()
 
  
 
-
+ function getMessage() { 
+                    var corpse_id = $("#corpse_id").val();
+                    var subject = $(".subject").val();
+                    var message = $(".message").val();                    
+                    messageSuperAdmin(message,subject,corpse_id);
+                  
+                }
 
         function myFunction()
             {
@@ -654,26 +649,135 @@ function addTask(taskName,addresTo_id,corpse_id) {
     },
     dataType: "json",
     success:function(data){
-        $("#getTask").html('');
-        getTasks(corpse_id);
-        $(".taskMess").html(data);
-        $(".taskMess").css("color","solid green");
-
-
-        setTimeout(function(){
-            var element = document.getElementById("getTask");
-            $(".my_Modal_Vacation").hide();
-            $(".task_error").html("");
-            $(".task").val('');
-            $(".taskMess").html('');
-            $(".taskMess").css('');
-
-             element.scrollIntoView();
-                    }, 1000);
+       
+       if (data.error!='') {
+        $(".taskMess").html(data.error);
+         $(".taskMess").css("color","solid red");
+       } else if(data.error_notification!='') {           
+            $("#getTask").html('');
+            getTasks(corpse_id);
+            $(".taskMess").html(data.error_notification);
+            $(".taskMess").css("color","solid green");
+        
+            setTimeout(function(){
+                var element = document.getElementById("getTask");
+                $(".my_Modal_Vacation").hide();
+                $(".task_error").html("");
+                $(".task").val('');
+                $(".taskMess").html('');
+                $(".taskMess").css('');
+                element.scrollIntoView();
+            }, 2000);
+       }else {           
+            $("#getTask").html('');
+            getTasks(corpse_id);
+            $(".taskMess").html(data.success);
+            $(".taskMess").css("color","solid green");
+        
+            setTimeout(function(){
+                var element = document.getElementById("getTask");
+                $(".my_Modal_Vacation").hide();
+                $(".task_error").html("");
+                $(".task").val('');
+                $(".taskMess").html('');
+                $(".taskMess").css('');
+                element.scrollIntoView();
+            }, 2000);
+       }
+  
 
     }
      });
 }
+
+
+
+
+
+
+/////////////   MESSAGE SUPERADMIN
+
+
+function messageSuperAdmin(message,subject,corpse_id) {
+
+$.ajax({
+type: "POST",
+url:"{{ route('corpses.messageSuperAdmin') }}",
+data: {
+'message' : message,
+'subject':subject,
+'corpse_id':corpse_id,
+"_token": "{{ csrf_token() }}",
+},
+dataType: "json",
+success:function(data){
+
+    if(data.error.length > 0)
+    {
+        var error_html = '';
+        for(var count = 0; count < data.error.length; count++)
+        {
+            error_html += '<div class="alert alert-danger">'+data.error[count]+'</div>';
+        }
+      
+        $('#outputx').html(error_html);
+     
+
+    }
+    else
+    {
+               
+                     $(".subject").val('');
+                     $(".message").val(''); 
+                     
+                     
+        var element = document.getElementById("getAllMessages");
+        $('#outputx').html( '<div class="alert alert-success">'+data.success+'</div>');
+            
+        setTimeout(function(){
+            $("#getAllMessages").html(''); 
+            getAllMessages($("#corpse_id").val());
+          $('#outputx').html(''); 
+          $('#close_message_model').click(); 
+      }, 2000);
+
+            setTimeout(function(){           
+            element.scrollIntoView(); 
+            
+        }, 4000);
+
+
+    }
+ 
+}
+ });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -751,10 +855,31 @@ function makeRequest(){
 
 
 
+      
+
+      function getSummary(corpse_id) { 
+    $.ajax({
+    type: "post",
+    url:"{{ route('corpses.getSummary') }}",
+    data: {
+    'corpse_id':corpse_id,
+    "_token": "{{ csrf_token() }}",
+    },
+    dataType: "json",
+    success:function(data){
+                $.each(data, function(i, item) {
+                    $("#getSummary").append( item.summary); 
+                });
+                 $("#getSummary").append('<br>');
+       }
+
+       });   
+    }
 
 
 
-function getTasks(corpse_id) {
+
+    function getTasks(corpse_id) {
   var container= $("#getTask");
     $.ajax({
     type: "post",
@@ -765,17 +890,36 @@ function getTasks(corpse_id) {
     },
     dataType: "json",
     success:function(data){
-
                 $.each(data, function(i, item) {
-                    $("#getTask").append('<div class="list-type3">  <ul> <li> <a href="#"> '+item.task+' '+timeAgo(item.created_at)+' </a>    </li>  </ul>   </div>');
+                    $("#getTask").append('  <tr  "><td> '+item.task+'</td> <td>'+timeAgo(item.created_at)+' </td> </tr> '); 
                 });
                  $("#getTask").append('<br>');
-
        }
 
-       });   // $("#getTask").html(data);///.delay(3000).fadeOut();
+       });   
     }
 
+
+
+    function getAllMessages(corpse_id) {
+ 
+    $.ajax({
+    type: "post",
+    url:"{{ route('corpses.getAllMessages') }}",
+    data: {
+    'corpse_id':corpse_id,
+    "_token": "{{ csrf_token() }}",
+    },
+    dataType: "json",
+    success:function(data){
+                $.each(data, function(i, item) {
+                    $("#getAllMessages").append('<tr><td>'+item.subject+'</td>'+'<td>'+item.message+'</td>'+'<td>'+timeAgo(item.created_at)+'  </td></tr> '); 
+                });
+                 $("#getAllMessages").append('<tr>');
+       }
+
+       });   
+    }
 
 
 

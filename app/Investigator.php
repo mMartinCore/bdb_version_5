@@ -9,7 +9,12 @@ use App\Station;
 
 class Investigator extends Model
 {
-    // use SoftDeletes;
+    
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
+ 
+  
+
 
     public $table = 'investigators';
 

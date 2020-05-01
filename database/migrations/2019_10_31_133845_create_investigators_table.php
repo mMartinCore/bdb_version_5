@@ -26,6 +26,7 @@ class CreateInvestigatorsTable extends Migration
             $table->integer('station_id')->unsigned()->index();
             $table->integer('user_id')->unsigned()->index();
             $table->integer('modified_by');
+            $table->softDeletes();
             $table->timestamps();
             // $table->foreign('rank_id')->references('id')->on('ranks');
             // $table->foreign('station_id')->references('id')->on('stations');

@@ -4,14 +4,15 @@
 @section('content')
 
 
-<div class="container">
+<div class="container"  style="min-height:900px;">
 <div class="col-lg-10 col-lg-offset-1">
 
-    <h3><i class="fa fa-corpses"></i>List of bodies reached thirty days </h3>
+    <h3><i class="fa fa-list-ul" aria-hidden="true"></i> List of bodies reached thirty days </h3>
     <div id="output"></div>
     <hr>
     <div  class="table-responsive">
-
+     <?php   $countVal=0;?>
+  
         <table class="table table-bordered table-striped">
 
             <thead  style=" width:100%;border-collapse:collapse;background-color:#3c8dbc; font-size:small; color:white" >
@@ -29,7 +30,7 @@
             </thead>
 
             <tbody style="font-size:small;" >
- <?php   $countVal=0;?>
+
     @foreach ($corpses as $corpse)
 
         @if ($corpse->storagedays() >= 30 && $corpse->burial_date =="")
@@ -41,12 +42,12 @@
                     if ($corpse->first_name == "Unidentified") {
 
                     if ($corpse->suspected_name != '')
-                        $name = '*' .$corpse->suspected_name. '*';
+                        $name = '*' .ucfirst($corpse->suspected_name). '*';
                     else {
                         $name = 'Unidentified';
                     }
                     } else {
-                    $name = $corpse->first_name . ' ' . $corpse->middle_name . ' ' . $corpse->last_name;
+                    $name = ucfirst($corpse->first_name) . ' ' . ucfirst($corpse->middle_name). ' ' . ucfirst($corpse->last_name);
                     }
                     $storagedays = '';
                     $excess = 0;
@@ -86,12 +87,12 @@
                       <td>{!! $corpse->pickup_date!!}</td>
                       @if ($corpse->pauper_burial_approved =='No')
                       <td  class=" text-danger   " >
-                          <h3 class="label label-danger"><i class="fa fa-clock-o"></i>    {!! $corpse->pauper_burial_approved!!}</h3>
+                          <h3 class="label label-danger"><i class="fa fa-clock-o"></i>  Denied</h3>
                       </td> 
   
                       @elseif ($corpse->pauper_burial_approved =='Processing')
-                      <td  class=" text-info   " >
-                          <h3 class="label label-info"><i class="fa fa-clock-o"></i>    {!! $corpse->pauper_burial_approved!!}</h3>
+                      <td  class=" text-warning   " >
+                          <h3 class="label label-warning"><i class="fa fa-clock-o"></i>    {!! $corpse->pauper_burial_approved!!}</h3>
                       </td> 
                       @else
                       <td  class=" text-success   " >
@@ -118,13 +119,14 @@
             </tbody>
             <?php
             if ($countVal ==0){
-                echo     " <h1>No Result Found</h1>";
+                echo     "<td colspan='8'><h4>No Data Found</h4></td>";
                 }
-                ?>
-        </table>
+                ?> 
+        </table>   
 
 {!! $corpses->links()  !!}
     </div>
+    
 
 {{--
     <a href="{{ route('corpses.create') !!}" class="btn btn-success">Add corpse</a> --}}

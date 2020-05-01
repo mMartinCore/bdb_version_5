@@ -13,15 +13,18 @@
         "consoletvs/charts": "5.*",
         "fideloper/proxy": "^4.0",
         "intervention/image": "^2.5",
-        "laravel/framework": "^5.8.0",
+        "laravel/framework": "5.7.28",
         "laravel/passport": "^7.0",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^5.4.0",
+        "livewire/livewire": "^1.0",
         "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "~3.0",
         "spatie/laravel-permission": "^2.29",
-        "unisharp/laravel-ckeditor": "^4.7",
-        "yajra/laravel-datatables-oracle": "^8.13"
+      
+        "kylekatarnls/laravel-carbon-2": "^1.0.0",
+        "nesbot/carbon": "2.0.0-beta.2 as 1.25.0",
+        "unisharp/laravel-ckeditor": "^4.7"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",
@@ -32,7 +35,7 @@
         "nunomaduro/collision": "^2.0",
         "phpunit/phpunit": "^7.0"
     },
-    "config": {
+    "config": { 
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
@@ -61,7 +64,10 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi",
+            "@php artisan vendor:publish --force --tag=livewire:assets --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

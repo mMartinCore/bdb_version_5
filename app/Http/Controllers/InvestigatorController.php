@@ -146,7 +146,7 @@ class InvestigatorController extends Controller
             $error_array =['Error, Something occurred while deleting!'];
         }
 
-        return redirect()->route('users.index')->with( 'flash_message','investigator successfully edited.' );
+        return redirect()->route('investigators.index')->with( 'flash_message','investigator successfully edited.' );
     }
 
     /**

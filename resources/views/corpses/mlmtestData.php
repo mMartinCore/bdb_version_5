@@ -18,7 +18,7 @@
 
 
 <script language="javascript">
- document.write("<style>body{zoom:95%;}</style>");
+ document.write("<style>body{zoom:90%;}</style>");
 
 
 

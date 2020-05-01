@@ -44,7 +44,7 @@ return [
             'driver' => 'mysql',
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'dd'),
+            'database' => env('DB_DATABASE', 'dbd'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', 'Mlm15506!!#'),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -56,40 +56,23 @@ return [
             'engine' => null,
         ]
 
-
+*/
 
  'mysql' => [
             'driver'    => 'mysql',
-            'host'      => '149.28.111.85',
-            'database'  => 'dd',
+            'host'      => '127.0.0.1',
+            'database'  => 'dbd',
             'username'  => 'root',
-            'password'  => 'Mlm15506!!#',
+            'password'  => '',//'Mlm15506!!#',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
 	    'engine'   => null,
         ]  
-*/
 
-'mysql' => [
-        'driver' => 'mysql',
-        'host' =>  '127.0.0.1',
-        'port' =>  '3306',
-        'database'=>'dd',
-        'username' =>  'root',
-        'password' => '',//Mlm15506!!#
-        'unix_socket' =>  '',
-        'charset' => 'utf8mb4',
-        'collation' => 'utf8mb4_unicode_ci',
-        'options' => [PDO::ATTR_EMULATE_PREPARES => true],
-        'prefix' => '',
-        'strict' => true,
-        'engine' => null,
-    ]
 	,
-
-        'pgsql' => [
+       'pgsql' => [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),

@@ -64,14 +64,17 @@ class LiveSearchController2 extends Controller
        $output = '';
        $rank ='';
        $query = $this->test_input($request->get('query'));
-
+       $auth_user_div_id= auth()->user()->station->division->id  ;
 
 
        if($query != '')
        {
 
-        $corpses = DB::table('corpses')
-          ->where('id', 'like', '%'.$query.'%')
+          
+
+          $corpses = DB::table('corpses')
+         
+          ->orwhere('id', 'like', '%'.$query.'%')
           ->orWhere('cr_no', 'like', '%'.$query.'%')
           ->orWhere('unidentified', 'like', '%'.$query.'%')
           ->orWhere('last_name', 'like', '%'.$query.'%')
@@ -93,6 +96,10 @@ class LiveSearchController2 extends Controller
           ->orderBy('id', 'desc')
           ->get();
 
+
+
+
+
        }
        else
        {
@@ -109,26 +116,27 @@ class LiveSearchController2 extends Controller
 
          foreach($corpses as $Corpse)
         {
-            $auth_user_div_id= auth()->user()->station->division->id  ;
+              
                 if ($Corpse->first_name =='Unidentified') {
-
                     if ($Corpse->suspected_name!=''){
                             $name='* '.$Corpse->suspected_name.' *';
                         }else{
                             $name='Unidentified';
                         }
+                   } else {
+                         $name= $Corpse->first_name.'  '.$Corpse->middle_name.' '.$Corpse->last_name ;
+                   }
 
-                } else {
-                    $name= $Corpse->first_name.'  '.$Corpse->middle_name.' '.$Corpse->last_name ;
-                }
-
-                    $output .= ' <h5> <a id="curlyStyle" href="#"  onclick="getViewId(' . $Corpse->id . ')" >'.$Corpse->cr_no.' '.   $name.'</a></h5><hr>  ';
-
-
+                   
+              if(!auth()->user()->hasRole('SuperAdmin')){
+                      if ($Corpse->division_id==$auth_user_div_id) {
+                           $output .= ' <h5> <a id="curlyStyle" href="#"  onclick="getViewId(' . $Corpse->id . ')" >'.$Corpse->cr_no.' '.   $name.'</a></h5><hr>  ';
+                      }
+              }else{
+                $output .= ' <h5> <a id="curlyStyle" href="#"  onclick="getViewId(' . $Corpse->id . ')" >'.$Corpse->cr_no.' '.   $name.'</a></h5><hr>  ';
+              } 
+            
           }
-
-
-
 
         }
        }

@@ -7,6 +7,7 @@ var corpseCountry = false;
 var death_date = true; //set true to accept no date
 
 var address = false;
+var summary = false;
 var parish = false;
 var corpse_stn_id=false;
 var dob = true;  //set true to accept no date
@@ -49,13 +50,17 @@ var finger_print_date =true;
 var finger_print =false;
 var gazetted =false;
 var gazetted_date =true;
+var volume_no = true;  //set true to accept no date
+
 var pauper_burial_requested  =false;
 var pauper_burial_requested_date =true;
 
 var buried= false;
 var burial_date= true;
 var dna =false;
-var dna_date=true
+var dna_date=true;
+var dna_result_date=true;
+var dna_result =true;
 
 var isCrNoUnique=false;
 
@@ -69,9 +74,14 @@ var isCrNoUnique=false;
 $("#pauper_burial_requested_show").slideUp();
 $(".cause_of_Death").attr("disabled", true);
 $(".pathlogist").attr("disabled", true);
+
 $(".address").val('');
 $(".pauper_burial_approved").val('');
 
+$(".volume_no").attr("disabled", true);
+
+$(".dna_result_date").attr("disabled", true);
+$(".dna_result").attr("disabled", true);
 
 if ( $(".suspected_name").val() !='') {
     $(".suspected_name").attr("disabled", false);
@@ -117,7 +127,24 @@ function is_dna() {
                          } else  if ($(".dna").val()==="No")
                                      {     dna =true;
                                         dna_date= true;
-                                           resetDateErorrBorder("dna");
+                                        resetDateErorrBorder("dna");
+                                        $(".dna_date").val("");
+                                        $("#Error_dna_date").hide();
+                                        $(".dna_date").css({"border":""});
+                                        $(".dna_date").attr("disabled", true);
+
+                                        $(".dna_result_date").val("");
+                                        $("#Error_dna_result_date").hide();
+                                        $(".dna_result_date").css({"border":""});
+                                        $(".dna_result_date").attr("disabled", true);
+                                        dna_result_date= true;
+
+                                        $(".dna_result").val("");
+                                        $("#Error_dna_result").hide();
+                                        $(".dna_result").css({"border":""});
+                                        $(".dna_result").attr("disabled", true);
+                                        dna_result= true;
+
                                      }  else
                                              {
                                                  $(".dna_date").val("");
@@ -145,18 +172,42 @@ function dnaDate()
          //  isfirstDateGreaterThanSecondDateNotReq("dna_date","postmortem_date")== true
             if (isfirstDateGreaterThanSecondDate("pickup_date","dna_date")== true )  {       // TESTIG FOR TRUE
                       dna_date =true;
+                      
+                      $(".dna_result_date").attr("disabled", false);
+
+
               } else {
-                      dna_date =false;
+                      dna_date =false;  
+                      resetDateErorrBorderDna();
                      }
      }
   }
 
 
 
+ 
+  function dnaResultDate()
+  {
+      if (!$(".dna_result_date").prop("disabled") )
+      { 
+            if ($(".dna_result_date").val()!='') {
 
-
-
-
+                        if (isfirstDateGreaterThanSecondDate("dna_date","dna_result_date")== true )  {  
+                         dna_result_date=true;
+                          $(".dna_result").attr("disabled", false);
+                         } else { 
+                          dna_result_date=false;
+                          resetErorrBorderDnaResult();
+                        }
+              
+            } else {
+              dna_result_date=true;
+               resetErorrBorderDnaResult();              
+              
+            }
+       } else{ dna_result_date=true;}
+    }
+  
 
 
 
@@ -212,8 +263,10 @@ function deathDropDown() {
         death = isTrueCheckRequireDrop('death',death_date);
 }
 
-function isGazetted() {
 
+
+function isGazetted() {
+ 
     if (requireDropDown("gazetted"))
     {
              if ($(".gazetted").val()==="Yes")
@@ -221,11 +274,18 @@ function isGazetted() {
                  $("#Error_gazetted_date").hide();
                  $(".gazetted_date").css({"border":""});
                  $(".gazetted_date").attr("disabled", false);
-                 gazetted =true;
+                 $(".volume_no").attr("disabled", false);
+                 gazetted =true; 
+                 $(".volume_no").css({"border":""});
+                 $(".volume_no").attr("disabled", false);
 
                  } else  if ($(".gazetted").val()==="No")
                              {     gazetted =true;
                                    gazetted_date= true;
+                                   volume_no=true;
+                                   $("#Error_volume_no").hide();
+                                   $(".volume_no").css({"border":""});
+                                   $(".volume_no").attr("disabled", true);
                                    resetDateErorrBorder("gazetted");
                              }  else
                                      {
@@ -234,6 +294,7 @@ function isGazetted() {
                                          $(".gazetted_date").css({"border":""});
                                          $(".gazetted_date").attr("disabled", true);
                                          gazetted_date= false;
+                                         volume_no=true;
 
                                      }
                  } else
@@ -242,6 +303,35 @@ function isGazetted() {
                          }
 
 }
+
+
+
+function volumeNo() {
+  var name ="volume_no";
+  if (!$("."+name).prop("disabled")) { 
+      volume_no=false;          
+      var my_val= $.trim($("."+name).val().length);
+         
+      if (my_val<=0) {
+            $("#Error_"+name).html("<small style='color:red'>*Required</small>");
+            $("#Error_"+name).show();
+            $("."+name).css("border","2px solid red");
+            volume_no  = false; 
+          }else if(my_val > 0 && my_val < 2 || my_val > 15) {
+                    $("#Error_"+name).html("<small style='color:red'>Should be between 2-15 characters</small>");
+                    $("#Error_"+name).show();
+                    $("."+name).css("border","2px solid red");
+                    volume_no  = false;
+                }else{
+                  $("."+name).css("border","2px solid green");
+                  $("#Error_"+name).hide(); 
+                  volume_no = true;
+                } 
+      }
+}
+
+
+
 
 
 
@@ -290,7 +380,7 @@ function pauperBurialRequested() { // GOOD CODING HERE
 
  function   pauperBurialApprovedDropDown(myVa){
     var value= $("."+myVa).val();
-    if (value.length < 1 || value ==''|| value ==null) {
+    if ($("."+myVa).val().length < 1 || value ==''|| value ==null) {
         $("."+myVa).css("border","2px solid red");
         $("#Error_"+myVa).html("<small style='color:red'>Choose an option..</small>");
           $("#Error_"+myVa).show();
@@ -650,6 +740,49 @@ function middleName(name,myClass)
 
 
 
+function case_summary()
+{   
+   var namex=$(".summary").val();
+   var  myClass="summary";
+    var my_val= $.trim(namex.length);
+
+    // if ($("#unidentified").val()==="No" && my_val <=0 ) {
+    //     $("#Error_"+myClass).html("<small style='color:red'> is allowed here... </small>");
+    //     $("#Error_"+myClass).show();
+    //     $("."+name).css("border","2px solid red");
+    //     return addVal  = false;
+    // }else  if ($("#unidentified").val()==="Yes" && my_val <=0 ) {
+    //     $("."+name).css("border","2px solid green");
+    //     $("#Error_"+myClass).hide();
+    //     return  addVal =true;
+    // }
+
+   // else
+
+    if (my_val >1 ) {
+        if(my_val < 7 || my_val > 1000) {
+            $("#Error_"+myClass).html("<small style='color:red'>Should be between 7-1000 letters</small>");
+            $("#Error_"+myClass).show();
+            $("."+myClass).css("border","2px solid red");
+            return   summary =false;
+        }
+        else {
+            $("."+myClass).css("border","2px solid green");
+            $("#Error_"+myClass).hide();
+            return  summary =true;
+        }
+    }else {
+      $("#Error_"+myClass).html("<small style='color:red'> circumstances unknown would suffice !</small>");
+      $("#Error_"+myClass).show();
+      $("."+myClass).css("border","2px solid red");
+      return   summary =false;
+    }
+
+}
+
+
+
+
 function corpseAddress(name,myClass)
 {  var addVal=false;
     namex=$("."+name).val();
@@ -779,6 +912,24 @@ function resetDateErorrBorder(field) {
     return true;
 }
 
+function resetDateErorrBorderDna() {
+  var field="dna_result_date";
+  $("."+field).attr("disabled", true);
+  $("#Error_"+field).hide();
+  $("."+field).css({"border":""});
+  $("."+field).val("");  
+  dna_result_date=true;
+}
+
+
+function resetErorrBorderDnaResult() {
+  var field="dna_result";
+  $("."+field).attr("disabled", true);
+  $("#Error_"+field).hide();
+  $("."+field).css({"border":""});
+  $("."+field).val("");  
+  dna_result=true;
+}
 
 
 function postMortemDate()
@@ -1131,9 +1282,8 @@ function corpse_stn()
 
 
 function getRequiredField(require)
-{
-     var  value = $("."+require).val();
-    if (value.length < 1) {
+{ 
+    if ($("."+require).val().length < 1) {
         $("."+require).css("border","2px solid red");
           $("#Error_"+require).html("<small style='color:red'>Choose an option..</small>");
           $("#Error_"+require).show();
@@ -1211,9 +1361,9 @@ function causeOfDeath(name)
     namex=$("."+name).val();
     var my_val= $.trim(namex.length);
    if ( my_val > 0 ) {
-            if(my_val < 7 || my_val > 150)
+            if(my_val < 7 || my_val > 1000)
               {
-                $("#Error_"+myClass).html("<small style='color:red'>Should be between 7-150 letters</small>");
+                $("#Error_"+myClass).html("<small style='color:red'>Should be between 7-1000 letters</small>");
                 $("#Error_"+myClass).show();
                 $("."+myClass).css("border","2px solid red");
                 return   false;
@@ -1238,7 +1388,35 @@ function causeOfDeath(name)
 
 
 
-
+function dnaResult()
+{
+    myClass='dna_result';
+    namex=$(".dna_result").val();
+    var my_val= $.trim(namex.length);
+   if ( my_val > 0 ) {
+            if(my_val < 7 || my_val > 500)
+              {
+                $("#Error_"+myClass).html("<small style='color:red'>Should be between 7-500 letters</small>");
+                $("#Error_"+myClass).show();
+                $("."+myClass).css("border","2px solid red");
+                dna_result=   false;
+              }else {
+                    $("."+myClass).css("border","2px solid green");
+                    $("#Error_"+myClass).hide();
+                    dna_result = true;
+                  }
+      } else if ( my_val <= 0 && !$(".dna_result").prop("disabled"))
+            {
+                $("#Error_"+myClass).html("<span style='color:red'> is now *mandatory...If not sure \'Negative Or Positive' suffice </span>");
+                $("#Error_"+myClass).show();
+                $("."+myClass).css("border","2px solid red");
+                dna_result= false;
+          }else {
+                    $("."+myClass).css("border","2px solid green");
+                    $("#Error_"+myClass).hide();
+                    dna_result =  true;
+                }
+}
 
 
 
@@ -1577,9 +1755,8 @@ function causeOfDeath(name)
 /// IO
 
 
-function requireDropDown(myVa){
-    var value= $("."+myVa).val();
-    if (value.length < 1) {
+function requireDropDown(myVa){ 
+    if ($("."+myVa).val()=='') {
         $("."+myVa).css("border","2px solid red");
         $("#Error_"+myVa).html("<small style='color:red'>Required..</small>");
           $("#Error_"+myVa).show();
@@ -1618,9 +1795,8 @@ $(".gazetted_date").attr("disabled", true);
 // var cr_no =
 
 function diaryType() {
-
-    var value= $(".diary_type").val();
-    if (value.length < 1) {
+ 
+    if ($(".diary_type").val().length < 1) {
         $(".diary_type").css("border","2px solid red");
         $("#Error_diary_type").html("<small style='color:red'>Required..</small>");
           $("#Error_diary_type").show();
@@ -1708,7 +1884,7 @@ function isNumberKey(evt)
 function diaryNo() {
 
     var value= $(".diary_no").val();
-    if (value.length < 1) {
+    if ($(".diary_no").val().length < 1) {
         $(".diary_no").css("border","2px solid red");
         $("#Error_diary_no").html("<small style='color:red'>Required.</small>");
           $("#Error_diary_no").show();
@@ -2359,6 +2535,18 @@ $(function() {
       });
 
 
+        ////////  ADDRESS
+        $(".summary").focusout(function() {
+          case_summary();
+      });
+
+
+      $(".summary").keyup(function() {
+         case_summary();
+      });
+        
+
+     
 
 
 
@@ -2392,10 +2580,16 @@ $(function() {
 
 
 
+      $(".volume_no").focusout(function() {
+        volumeNo();
+     });
+
+     $(".volume_no").mouseleave(function() {
+      volumeNo();
+      });
 
 
-
-
+  
 
 
 
@@ -2579,6 +2773,17 @@ $(".pathlogist").focusout(function() {
   });
 
 
+  $(".dna_result").focusout(function() {
+    dnaResult();
+ });
+
+
+ $(".dna_result").keyup(function() {
+  dnaResult();
+
+  });
+
+
 
 ////////////////////////
 
@@ -2606,6 +2811,19 @@ $(".dna_date").mouseleave(function() {
 
 });
 
+
+
+
+
+$(".dna_result_date").focusout(function() {
+  dnaResultDate();
+});
+
+
+$(".dna_result_date").mouseleave(function() {
+  dnaResultDate();
+
+});
 
 
 

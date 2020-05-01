@@ -13,7 +13,7 @@ function checkTask() {
           $(".task_error").text("NO TASK ENTERED!");
           $(".task").css("border","2px solid red");
 
-  }else  if(taskx.length > 150){
+  }else  if(taskx.length > 500){
           $(".task").css("border","2px solid red");;
           $(".task_error").html("TASK  IS TOO WORDY!");
   }else if( taskx.length !=null && taskx.length < 7){

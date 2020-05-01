@@ -10,4 +10,7 @@ Good day <strong>{{ $name }}</strong>,
       Tel: 876- 927-4597
 
 
-</small>
+</small> <br>
+<small style="color:red">
+      This email was automatically generated, please do not reply.
+<small>

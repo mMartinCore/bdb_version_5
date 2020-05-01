@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
-use App\Officer;
+use App\Corpse;
 use App\Commendation ;
 use App\Catcommendation;
 use Validator;
@@ -151,7 +151,18 @@ class ParishController extends  Controller
 
             return redirect(route('parishes.index'));
         }
-
+           ////////////////////
+           $chech_if_Id_InUse=null;
+           $corpses =Corpse::where('parish',$id)->get();
+           foreach ($corpses as $corpse) {
+              $chech_if_Id_InUse= $corpse;
+           }
+           
+           if (!empty($chech_if_Id_InUse)) {
+               Session::flash('error','Entity integrity constraints Enforces, Cannot be deleted !');
+               return redirect(route('parishes.index'));
+           }  
+           /////////////////////////
        $parish->delete($id);
 
        Session::flash('success','Parish deleted successfully.');

@@ -37,10 +37,11 @@
         <div class="form-group    {{$errors->has('rank_id') ? 'has-error' :''}}">
             {{Form::label('rank_id', 'Rank')}}<small id="Error_rank_id"></small>
             <select name="rank_id" value="{{Request::old('rank_id')}}" class=" rank_id form-control" >
-            <option value="{!!$user->rank->id!!}">{!!$user->rank->rank !!} </option>
-                    <option value="">Select a Rank</option>
+            <option value="{!!$user->rank->id!!}">{!!$user->rank->rank !!} </option> 
                           @foreach($ranks as $rank)
-                                 <option value='{{$rank->id }}'>{{ $rank->rank}}</option>
+                                @if ( $rank->id != $user->rank->id)
+                                <option value='{{$rank->id }}'>{{ $rank->rank}}</option>
+                                @endif                                 
                           @endforeach
             </select>
         </div>
@@ -65,10 +66,11 @@
     <div class="form-group     {{$errors->has('station_id') ? 'has-error' :''}}">
         {{Form::label('station_id', 'Station')}}<small id="Error_station_id"></small>
         <select name="station_id" value="{{Request::old('station_id')}}" onchange="investigator_stn()" class=" station_id form-control" >
-        <option value='{!! $user->station->id !!}'>{!! $user->station->station !!}  </option>
-                <option value="">Select a Station</option>
+        <option value='{!! $user->station->id !!}'>{!! $user->station->station !!}  </option>               
                       @foreach($stations as $station)
-                             <option value='{!! $station->id !!}'>{!! $station->station!!}</option>
+                            @if ( $user->station->id !=$station->id )
+                            <option value='{!! $station->id !!}'>{!! $station->station!!}</option>
+                            @endif
                       @endforeach
         </select>
     </div>

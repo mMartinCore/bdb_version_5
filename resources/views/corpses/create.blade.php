@@ -82,13 +82,12 @@
                     <div class="title"><h4> <i class="fa fa-plus-circle" aria-hidden="true"></i>  New Corpse Detail </h4></div> 
                     <div id="output"></div>
                     <div   class="panel-body" style="background:white">
+                            @include('corpses.step')
                         <span id="form_output"></span>
                 <div class="row" >
                     {!! Form::open(['route' => 'corpses.store','id'=>'postForm']) !!}
                        {{csrf_field()}}
-                       @include('corpses.fields')
-
-
+                       @include('corpses.fields')                  
                     {!! Form::close() !!}
                 </div>
             </div>

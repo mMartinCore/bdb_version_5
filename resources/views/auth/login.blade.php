@@ -15,7 +15,22 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
 
         <script language="javascript">
-          document.write("<style>body{zoom:90%;}</style>");
+              if ( screen.width >= 1280 && screen.width <= 1536) {
+
+                    document.write("<style>body{zoom:80%;}</style>");
+                    }
+                    else if ( screen.width >= 1180   && screen.width < 1280) {
+                    document.write("<style>body{zoom:75%;}</style>");
+                    }
+                    else if ( screen.width >=750  && screen.width < 1080 ) {
+                    document.write("<style>body{zoom:100%;}</style>");
+                    }
+                    else if ( screen.width <= 750 ) {
+                    document.write("<style>body{zoom:130%;}</style>");
+                    }else{
+                      document.write("<style>body{zoom:88%;}</style>");
+                    }
+
           </script>
 
 
@@ -102,7 +117,7 @@
       box-shadow: 0 0 15px #00fffd;
       border-radius: 5px;
       display: inline-block;
-      height: 490;
+      height: auto;
       margin: 200px auto 0;
       position: relative;
       z-index: 4;
@@ -391,7 +406,7 @@
             <h4 style="color: aliceblue">Dead Body Disposal System</h4>
             <div id="fade-box">
                 <div class="form-group has-feedback">
-                    <input type="email" id="email" name ="email" style="font-size:18px" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }} " placeholder="Email as Useraname" required>
+                    <input type="email" id="email" name ="email" autocomplete='off'  style="font-size:18px" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }} " placeholder="Email as Useraname" required>
 
                               @if ($errors->has('email'))
                                     <span class="invalid-feedback" role="alert">
@@ -401,7 +416,7 @@
                 </div>
 
                 <div class="form-group has-feedback">
-                    <input type="password" style="font-size:20px" id="password"  name="password" class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="Password" required>
+                    <input type="password" style="font-size:20px" id="password" autocomplete='off'   name="password" class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="Password" required>
                             @if ($errors->has('password'))
                                 <span class="invalid-feedback" role="alert">
                                     <strong  style="color:red">{{ $errors->first('password') }}</strong>
@@ -415,8 +430,8 @@
           @if (Route::has('password.request'))
                     <h2>    <a class="btn btn-link " style="color:white" href="{{ route('password.request') }}">
                         {{ __('Forgot Your Password?') }}
-                    </a></h2>
-                                @endif
+                    </a></h2><br>
+                @endif
         </form>
 
 

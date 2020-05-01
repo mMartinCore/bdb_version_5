@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Station;
 use Illuminate\Http\Request;
 use App\Events\UserRegistered;
-
+use App\Corpse;
 use App\Events\UserRole;
 //use Session;
 use App\User;
@@ -209,8 +209,15 @@ class UserController extends Controller
             $user =  User::findOrFail($id); 
         }
         $roles = Role::get(); //Get all roles
-        $ranks=Rank::all();
-        $stations = Station::all();
+        $ranks=Rank::get();
+        
+        $auth_user_div_id= auth()->user()->station->division->id;
+        if(!auth()->user()->hasRole('SuperAdmin')){
+            $stations = Station::where('division_id', $auth_user_div_id)->get();
+         }else{
+             $stations = Station::get();
+         }
+
         return view('users.edit')->withRoles($roles)->withStations($stations)->withRanks($ranks)->withUser($user);
 
 
@@ -352,6 +359,18 @@ class UserController extends Controller
     {
 
 
+             ////////////////////
+       $chech_if_Id_InUse=null;
+       $corpses =Corpse::where('user_id',$id)->get();
+       foreach ($corpses as $corpse) {
+          $chech_if_Id_InUse= $corpse;
+       }
+       
+       if (!empty($chech_if_Id_InUse)) {
+           Session::flash('error','Entity integrity constraints Enforces, Cannot be deleted !');
+           return redirect(route('users.index'));
+       }  
+       /////////////////////////
 
         //Find a user with a given id and delete
         $user = User::findOrFail($id);

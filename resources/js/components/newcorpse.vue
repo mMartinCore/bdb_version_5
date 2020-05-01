@@ -12,13 +12,13 @@
                      <li >  <a class="header" v-if="corpsenotification.length==0" style="text-align: center" > <b><i> You have no notifications</i></b> </a> </li>
                     <!-- Inner Menu: contains the notifications -->
                   <li>
-                    <ul class="menu">
+                    <ul class="menu"  v-if="corpsenotification.length >0" style="height: 350px; overflow-y: auto; overflow-x: hidden;">
                         <div class="dropdown-item form-inline" v-on:click="markAsReadx(notes)"  v-for="notes in corpsenotification"  v-bind:key="notes.id"> <br>
                            <a  href="#" v-on:click="markAsReadx(notes)"  class="header form-inline" v-if="notes.data['newCorpse']['type']==='Created' ">
                              <i class="fa fa-book" aria-hidden="true"></i>&nbsp;&nbsp;  {{ notes.data['newCorpse']['user'] }}  of {{ notes.data['newCorpse']['division'] }}  post a new corpse <b> {{ notes.created_at | myOwnTime }}</b><br>
                          </a>
 
-          <a  href="#" v-on:click="markAsReadx(notes)"  class="header form-inline" v-if="notes.data['newCorpse']['type']==='Request' ">
+                           <a  href="#" v-on:click="markAsReadx(notes)"  class="header form-inline" v-if="notes.data['newCorpse']['type']==='Request' ">
                              <i class="fa fa-book" aria-hidden="true"></i>&nbsp;&nbsp;  {{ notes.data['newCorpse']['user'] }}  of {{ notes.data['newCorpse']['division'] }}  made a Pauper's Burial Request  <b> {{ notes.created_at | myOwnTime }}</b><br>
                          </a>
 
@@ -34,6 +34,10 @@
 
                          <a href="#" class="header form-inline" v-on:click="markAsReadx(notes)"    v-if="notes.data['newCorpse']['type']==='task' " >
                             <i class="fa fa-book" aria-hidden="true"></i>&nbsp;&nbsp;  {{ notes.data['newCorpse']['from'] }} <b>@</b>DCP Admin sent you a new task <b> {{notes.created_at | myOwnTime }}</b><br>
+                        </a>
+
+                         <a href="#" class="header form-inline" v-on:click="markAsReadx(notes)"    v-if="notes.data['newCorpse']['type']==='message' " >
+                            <i class="fa fa-book" aria-hidden="true"></i>&nbsp;&nbsp;  {{ notes.data['newCorpse']['from'] }}   sent you a new message <b> {{notes.created_at | myOwnTime }}</b><br>
                         </a>
 
                        <a href="#" class="header form-inline"    v-on:click="markAsReadx(notes)"    v-if="notes.data['newCorpse']['type']==='Overthirty' " >
@@ -73,11 +77,17 @@
          <i class="fa fa-book" aria-hidden="true"></i>&nbsp;New user: {{ notes.data['newCorpse']['name'] }} of {{notes.data['newCorpse']['station']  }} {{notes.data['newCorpse']['division']  }} registered <b> {{notes.created_at | myOwnTime }}</b><br>
    </a>
                          </div>
-                     <div class="footer" style="text-align: center" v-on:click="markAllNewCorpseNotifyAsReadx()" v-if="corpsenotification.length > 0">
-                         <hr>
-                         <b><i>Mark all as read</i></b>
-                    </div>
+                
                         </ul>
+                             <div class="footer" style="text-align: center" v-on:click="markAllNewCorpseNotifyAsReadx()" v-if="corpsenotification.length > 0">
+                   
+                    
+                    </div>
+                       <div class="footer" style="text-align: center" v-on:click="markAllNewCorpseNotifyAsReadx()" v-if="corpsenotification.length > 0">
+                         <hr>
+                      <b  v-if="corpsenotification.length>0"><i>Mark all as read</i></b>                    
+                          </div>
+                        
                      </li>
                  </ul>
              </li>
@@ -99,14 +109,16 @@
                  //  window.location.href = "{{URL::to('readNewCorpseNotify/')}}"
                       //   window.location = '{{ url(readNewCorpseNotify/'+data.not_id+')}}'
                          //  window.location.href = "{!! route('readNewCorpseNotify', data.not_id) !!}";
-                           window.location.href = "/readNewCorpseNotify/"+data.not_id;
+                           window.location.href=  window.location.protocol+"//"+window.location.hostname+"/readNewCorpseNotify/"+data.not_id;
+                           //window.location.href = "/readNewCorpseNotify/"+data.not_id;
                         //window.location="readNewCorpseNotify/"+data.not_id;
                     });
 
               },
                   markAllNewCorpseNotifyAsReadx:function() {
                       axios.post("markAllNewCorpseNotifyAsRead").then(response =>{
-                        window.location.href="allReadCorpseNofication";
+                       window.location.href=  window.location.protocol+"//"+window.location.hostname+"/allReadCorpseNofication";
+                      //  window.location.href="allReadCorpseNofication";
                     });
          }
 

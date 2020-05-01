@@ -68,7 +68,7 @@ class daily extends Command
     public function thirty_Over()
     {
         $storagedays=array();
-        $corpses= Corpse::where('pickup_date', '!=',null)->get();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
             foreach ($corpses as $corpse) {
                     if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) >= 30 && $corpse->burial_date =='')
                     {  $name='';
@@ -120,7 +120,7 @@ class daily extends Command
     public function fifteenDays()
     {
         $storagedays=array();
-        $corpses= Corpse::where('pickup_date', '!=',null)->get();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
             foreach ($corpses as $corpse) {
                     if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) == 15 && $corpse->postmortem_date ==''&& $corpse->burial_date =='')
                     {  $name='';
@@ -174,7 +174,7 @@ class daily extends Command
     public function twentyFiveDays()
     {
         $storagedays=array();
-        $corpses= Corpse::where('pickup_date', '!=',null)->get();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
             foreach ($corpses as $corpse) {
                     if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) == 25 && $corpse->postmortem_date ==''&& $corpse->burial_date =='')
                     {  $name='';
@@ -222,7 +222,7 @@ class daily extends Command
     public function postmortemCompNotBuried()
     {
         $storagedays=array();
-        $corpses= Corpse::where('pickup_date', '!=',null)->get();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
             foreach ($corpses as $corpse) {
                     if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) >= 25 && $corpse->postmortem_date !='' && $corpse->postmortem_status =='Completed'&& $corpse->burial_date =='')
                     {  $name='';
@@ -272,7 +272,7 @@ class daily extends Command
 public function pending_and_no_postmortem(){
      $now= Carbon::now();
     $storagedays=array();
-    $corpses= Corpse::where('pickup_date', '!=',null)->get();
+    $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
         foreach ($corpses as $corpse) {
 
                 if ( $corpse->postmortem_date < $now && $corpse->burial_date == '' && $corpse->postmortem_status=='Pending')

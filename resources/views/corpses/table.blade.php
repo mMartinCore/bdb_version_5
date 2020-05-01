@@ -19,10 +19,10 @@ height:2px; width:5px; padding:3px;
 
 <span id="error"></span>
 <div class="table-responsive">
-<small>Total record(s): <b> <span id="count"></span></small></b>
+<small>Total record(s): <b> {{$total_records}}</small></b>
 
 
-  <table id="corpses-table" class="table table-hover stripe" id="commendations-table ">       <thead>
+  {{-- <table id="corpses-table" class="table table-hover stripe" id="commendations-table ">       <thead>
 
         <thead  style="width:100%;border-collapse:collapse;background-color:#3c8dbc; font-size:small; color:white" >
             <tr>
@@ -44,16 +44,25 @@ height:2px; width:5px; padding:3px;
         <tbody>
 
         </tbody>
-    </table>
-    <div id="pagination_link">
+    </table> --}}
 
-    </div>
+
+
+
+    @include('corpses.pagination')
+
+
+
+
+
+
+
+
+
+ 
 </div>
 
 
-
-
-@include('corpses.showModal')
 
 
 
@@ -95,23 +104,7 @@ setTimeout(function() {
 
 
 
-
-// function getEditId(id) {
-//   //  document.getElementById('demo02').click(); // Works!
-//      $("#load_show_view").load('corpses/'+id+'/edit', function(responseTxt, statusTxt, xhr){
-//       if(statusTxt == "success")
-//        {    document.getElementById('demo02').click(); // Works!
-//            return false;
-//     }
-//       if(statusTxt == "error"){
-//         alert("Error: " + xhr.status + ": " + xhr.statusText);
-//       }
-//       return false;
-
-//     });
-//  }
-
-
+ 
 
 
 
@@ -120,65 +113,7 @@ setTimeout(function() {
 $(document).ready(function() {
  //   getCorpses(1)
 
-
-
-   load_data(1);
-    $('#postForm').on('submit', function(event){
-         event.preventDefault();
-
-          $(".loading-icon").removeClass("hide");
-          $(".btnLoaderSimpleSearch").attr("disabled", true);
-          $(".btn-txt").text("Fetching Data Please wait...");
-
-        var form_data = $(this).serialize();
-
-        $.ajax({
-        url:"{{ route('corpses.getCorpse') }}",
-        method:"POST",
-        data:form_data,
-       // dataType:"json",
-    success:function(data){
-
-
-
-
-
-           $(".loading-icon").addClass("hide");
-            $(".btnLoaderSimpleSearch").attr("disabled", false);
-            $(".btn-txt").text("Search");
-
-
-
-
-
-
-       $("#count").html(data['cnt']+' of '+data['search_Count_total']);
-        $("tbody").html(data['table']);
-        $("#pagination_link").html(data['pagination_link']);
-        $('#error').html(data['except']);
-       },
-       error: function (jqXHR, exception) {
-        var msg = '';
-        if (jqXHR.status === 0) {
-            msg = 'Not connect.\n Verify Network.';
-        } else if (jqXHR.status == 404) {
-            msg = 'Requested page not found. [404]';
-        } else if (jqXHR.status == 500) {
-            msg = 'Internal Server Error [500].';
-        } else if (exception === 'parsererror') {
-            msg = 'Requested JSON parse failed.';
-        } else if (exception === 'timeout') {
-            msg = 'Time out error.';
-        } else if (exception === 'abort') {
-            msg = 'Ajax request aborted.';
-        } else {
-            msg = 'Uncaught Error.\n' + jqXHR.responseText;
-        }
-        $('#error').html(msg);
-    }
-
-       });
-    });
+ 
 
 
     $(".reset").click(function(e) {
@@ -198,55 +133,55 @@ $(document).ready(function() {
 
 
 
-    $('.savedAdvance').click( function(event){
-         event.preventDefault();
-         $(".load-icon").removeClass("hide");
-          $(".loadFormAdvance").attr("disabled", true);
-          $(".btnloadFormAdvancetxt").text("Fetching Data Please wait...");
-         $("#pageNumForm2").val(1);
-        var form_data = $(".opendForm2").serializeArray();
+    // $('.savedAdvance').click( function(event){
+    //      event.preventDefault();
+    //      $(".load-icon").removeClass("hide");
+    //       $(".loadFormAdvance").attr("disabled", true);
+    //       $(".btnloadFormAdvancetxt").text("Fetching Data Please wait...");
+    //      $("#pageNumForm2").val(1);
+    //     var form_data = $(".opendForm2").serializeArray();
 
 
-        $.ajax({
-        url:"{{ route('corpses.getCorpse') }}",
-        method:"POST",
-        data:form_data,
-    success:function(data){
+    //     $.ajax({
+    //     url:"{{ route('corpses.getCorpse') }}",
+    //     method:"POST",
+    //     data:form_data,
+    // success:function(data){
 
 
-           $(".load-icon").addClass("hide");
-            $(".loadFormAdvance").attr("disabled", false);
-            $(".btnloadFormAdvancetxt").text("Search");
+    //        $(".load-icon").addClass("hide");
+    //         $(".loadFormAdvance").attr("disabled", false);
+    //         $(".btnloadFormAdvancetxt").text("Search");
 
 
-       $("#count").html(data['cnt']+' of '+data['search_Count_total']);
+    //    $("#count").html(data['cnt']+' of '+data['search_Count_total']);
 
-        $("tbody").html(data['table']);
-        $("#pagination_link").html(data['pagination_link']);
-        $('#error').html(data['except']);
-       },
-       error: function (jqXHR, exception) {
-        var msg = '';
-        if (jqXHR.status === 0) {
-            msg = 'Not connect.\n Verify Network.';
-        } else if (jqXHR.status == 404) {
-            msg = 'Requested page not found. [404]';
-        } else if (jqXHR.status == 500) {
-            msg = 'Internal Server Error [500].';
-        } else if (exception === 'parsererror') {
-            msg = 'Requested JSON parse failed.';
-        } else if (exception === 'timeout') {
-            msg = 'Time out error.';
-        } else if (exception === 'abort') {
-            msg = 'Ajax request aborted.';
-        } else {
-            msg = 'Uncaught Error.\n' + jqXHR.responseText;
-        }
-        $('#error').html(msg);
-    }
+    //     $("tbody").html(data['table']);
+    //     $("#pagination_link").html(data['pagination_link']);
+    //     $('#error').html(data['except']);
+    //    },
+    //    error: function (jqXHR, exception) {
+    //     var msg = '';
+    //     if (jqXHR.status === 0) {
+    //         msg = 'Not connect.\n Verify Network.';
+    //     } else if (jqXHR.status == 404) {
+    //         msg = 'Requested page not found. [404]';
+    //     } else if (jqXHR.status == 500) {
+    //         msg = 'Internal Server Error [500].';
+    //     } else if (exception === 'parsererror') {
+    //         msg = 'Requested JSON parse failed.';
+    //     } else if (exception === 'timeout') {
+    //         msg = 'Time out error.';
+    //     } else if (exception === 'abort') {
+    //         msg = 'Ajax request aborted.';
+    //     } else {
+    //         msg = 'Uncaught Error.\n' + jqXHR.responseText;
+    //     }
+    //     $('#error').html(msg);
+    // }
 
-       });
-    });
+    //    });
+    // });
 
 
 

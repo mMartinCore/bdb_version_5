@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Anatomy;
 use App\Corpse;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -31,6 +32,11 @@ class CorpseExport implements FromCollection,WithHeadings,WithMapping
         return $now->diffInDays($pickupDate);
     }
 
+    public function anatomy($id)
+    {    
+        $anatomy  = Anatomy::findOrFail($id);
+        return $anatomy->anatomy;
+    }
 
     public function map($corpse): array
     {
@@ -42,7 +48,7 @@ class CorpseExport implements FromCollection,WithHeadings,WithMapping
                 $corpse->suspected_name,
                 $corpse->death_date,
                 $corpse->pickup_date ,
-                $corpse->anatomy,
+                $this->anatomy($corpse->anatomy_id),
                 $corpse->postmortem_status,
                 $corpse->division,
                 $corpse->pauper_burial_requested ,

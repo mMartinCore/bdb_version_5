@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use Response;
+use App\Corpse;
 use Illuminate\Support\Facades\Input;
 use App\http\Requests;
 use Session;
@@ -149,7 +150,18 @@ class StationController extends  Controller
 
             return redirect(route('stations.index'));
         }
-
+       ////////////////////
+       $chech_if_Id_InUse=null;
+       $corpses =Corpse::where('station_id',$id)->get();
+       foreach ($corpses as $corpse) {
+          $chech_if_Id_InUse= $corpse;
+       }
+       
+       if (!empty($chech_if_Id_InUse)) {
+           Session::flash('error','Entity integrity constraints Enforces, Cannot be deleted !');
+           return redirect(route('stations.index'));
+       }  
+       /////////////////////////
         $station->delete($id);
 
        Session::flash('success','Station deleted successfully.');

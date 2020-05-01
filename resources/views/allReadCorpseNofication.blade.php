@@ -5,7 +5,7 @@
             -webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
               box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
         }</style>
-<div class="container">
+<div class="container"   style="min-height:800px;">
         <div class="col-lg-10 col-lg-offset-2">
                 <br><br>
 
@@ -19,6 +19,7 @@
                     </div>
 
                 <div class=" card-body">
+                    <div style="height: 600px; overflow-y: auto; overflow-x: hidden;"> 
                     <ul class="item-group">
 
                         @foreach ($corpses as $corpse)
@@ -92,6 +93,10 @@
                             {{  $corpse->data['newCorpse']['from'] }} <b>@</b>DCP Admin sent you a new <b><i>task</i> </b>
                             <b>{{ $corpse->created_at->diffForHumans()}}</b> <a   onclick="getViewId_view_Notify({!!$corpse->data['newCorpse']['id']!!});" href="#"><i>View</i></a>
 
+                           
+                            @elseif ( $corpse->data['newCorpse']['type']==="message")
+                              {{  $corpse->data['newCorpse']['from'] }}   sent you a new <b><i>message</i> </b>
+                            <b>{{ $corpse->created_at->diffForHumans()}}</b> <a   onclick="getViewId_view_Notify({!!$corpse->data['newCorpse']['id']!!});" href="#"><i>View</i></a>
 
                             @elseif ( $corpse->data['newCorpse']['type']==="NewUser")
                              New user  {{  $corpse->data['newCorpse']['name'] }} of {{  $corpse->data['newCorpse']['station'] }}  {{  $corpse->data['newCorpse']['division'] }} <b><i> Request Role id:{{ $corpse->data['newCorpse']['id'] }}</i> </b> ->
@@ -101,8 +106,9 @@
 
                            </li><hr>
                         @endforeach
+                        
                     </ul>
-
+                </div>
                 </div>
             </div>
         </div>

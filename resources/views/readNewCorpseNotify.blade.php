@@ -57,7 +57,12 @@
                                 <b>{{ $corpse->created_at->diffForHumans()}}</b> <a   onclick="getViewId_view_Notify({!!$corpse->data['newCorpse']['id']!!});" href="#"><i>View</i></a>
                                 @endif
 
+                            @elseif ( $corpse->data['newCorpse']['type']==="message")
+                            {{  $corpse->data['newCorpse']['from'] }}   sent you a new  <b><i>Message</i> </b>
+                            <b>{{ $corpse->created_at->diffForHumans()}}</b> <a   onclick="getViewId_view_Notify({!!$corpse->data['newCorpse']['id']!!});" href="#"><i>View</i></a>
+    
 
+                                
                             @elseif ( $corpse->data['newCorpse']['type']==="Overthirty")
                             Corpse Reference #: {{ $corpse->data['newCorpse']['id'] }}     of {{ $corpse->data['newCorpse']['division'] }} Over <b >thirty(30)</b> days <b><i>...</i> </b>
                             <b>{{ $corpse->created_at->diffForHumans()}}</b> <a   onclick="getViewId_view_Notify({!!$corpse->data['newCorpse']['id']!!});" href="#"><i>View</i></a>
@@ -94,7 +99,7 @@
                             {{  $corpse->data['newCorpse']['from'] }} <b>@</b>DCP Admin sent you a new <b><i>task</i> </b>
                             <b>{{ $corpse->created_at->diffForHumans()}}</b> <a   onclick="getViewId_view_Notify({!!$corpse->data['newCorpse']['id']!!});" href="#"><i>View</i></a>
 
-
+                            
                             @elseif ( $corpse->data['newCorpse']['type']==="NewUser")
                              New user  {{  $corpse->data['newCorpse']['name'] }} of {{  $corpse->data['newCorpse']['station'] }}  {{  $corpse->data['newCorpse']['division'] }} <b><i> Request Role id:{{ $corpse->data['newCorpse']['id'] }}</i> </b> ->
                             <b>{{ $corpse->created_at->diffForHumans()}}</b> <a   href="{!! route('users.edit', [$corpse->data['newCorpse']['id'] ]) !!}"  ><i>View</i></a>

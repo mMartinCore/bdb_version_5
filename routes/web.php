@@ -13,12 +13,37 @@ Route::group(['middleware' => 'revalidate'], function()
   Auth::routes();
     // Routes that you want to revalidate go in here
 
-Route::get('/create_role_permission',function(){
-  $role = Role::create(['name' => 'Administer ']);
-   $permission = Permission::create(['name' => 'Administer roles & permissions']);
- auth()->user()->assignRole('Administer');
- auth()->user()->givePermissionTo('Administer roles & permissions');
- });
+// Route::get('/create_role_permission',function(){
+//   $role = Role::create(['name' => 'Administer ']);
+//    $permission = Permission::create(['name' => 'Administer roles & permissions']);
+//  auth()->user()->assignRole('Administer');
+//  auth()->user()->givePermissionTo('Administer roles & permissions');
+//  });
+
+
+
+
+
+//  Route::get('/tesla',function(){  
+//      return view("tesla");
+//  });
+
+
+
+
+ Route::get('/pagination', 'PaginationController@index');
+
+ Route::get('/pagination/fetch_data', 'PaginationController@fetch_data');
+ 
+
+
+
+
+
+
+
+
+
 
     //Route::get('/',  'OfficersController@index')->name('home');
     Route::resource('corpses', 'CorpseController');
@@ -71,7 +96,7 @@ Route::get('/create_role_permission',function(){
 
     Route::Post('/recentActivities','CorpseController@recentActivities')->name('recentActivities');
 
-
+    Route::resource('feedbacks', 'FeedbackController');
 
     Route::get('charts', 'ChartController@index')->name('chart.index');
     Route::resource('users', 'UserController');
@@ -88,13 +113,18 @@ Route::get('/create_role_permission',function(){
  //   Route::resource('skillscategories', 'CategorySkillsController', ['except' => ['create']]);
     Route::resource('isOnlines', 'OnlineusersController', ['except' => ['create']]);
     Route::post('corpses/task', 'CorpseController@taskPost')->name('corpses.task');
+    
 
+    Route::post('corpses/messageSuperAdmin', 'CorpseController@messageSuperAdmin')->name('corpses.messageSuperAdmin');
     // Route::get('/live_search', 'LiveSearch@index');
     // Route::get('/live_search/action', 'LiveSearch@action')->name('live_search.action');
     Route::get('/search/action', 'LiveSearchController2@action')->name('live_search.action');
     Route::get('/live_search/ajaxCall', 'LiveSearch@ajaxCall')->name('live_search.data');
 
+    Route::post('corpses/getSummary', 'CorpseController@getSummary')->name('corpses.getSummary');// route
     Route::post('corpses/getTasks', 'CorpseController@getTasks')->name('corpses.getTasks');// route
+    Route::post('corpses/getAllMessages', 'CorpseController@getAllMessages')->name('corpses.getAllMessages');// route
+    
     Route::post('/getInvestigator', 'CorpseController@getInvestigator')->name('getInvestigator');// route
     Route::post('/getEditInvest_id', 'CorpseController@getEditInvest_id')->name('getEditInvest_id');// route
 
@@ -137,9 +167,9 @@ Route::group(['prefix' => 'laravel-crud-search-sort'], function () {
     Route::delete('delete/{id}', 'Crud2Controller@delete');
 });
 
-    Route::get('Exception\exception',function(){
-    return view('exception');
+    // Route::get('Exception\exception',function(){
+    // return view('exception');
 
-        });
+    //     });
         });
 

@@ -12,6 +12,7 @@ use App\Corpse;
 use App\Division;
 use Illuminate\Http\Request;
 use Flash;
+use App\Dna;
 use App\Funeralhome;
 use Response;
 use App\Station;
@@ -31,7 +32,9 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Manner;
 use App\Condition;
 use App\Anatomy;
+use App\Message;
 use Session;
+use App\Occurrence;
 use  Charts;
 use App\Parish;
 use App\Http\Controllers\mysql_real_escape_string;
@@ -80,26 +83,23 @@ class CorpseController extends Controller
         $funeralhomes = Funeralhome::get();
         $auth_user_div_id= auth()->user()->station->division->id  ;
         $parishes=Parish::get();
+  
         if(!auth()->user()->hasRole('SuperAdmin')){
-           $stations = Station::where('division_id', $auth_user_div_id)->get();
-        }else{
-            $stations = Station::get();
-        }
-
-
-        if(!auth()->user()->hasRole('SuperAdmin')){
+            $stations = Station::where('division_id', $auth_user_div_id)->get();
             $divisions = Division::where('id', $auth_user_div_id)->get();
+            $total_records=Corpse::where('division_id', $auth_user_div_id)->count();
+            $corpses=Corpse::where('division_id', $auth_user_div_id)->latest('updated_at')->paginate(10);
          }else{
             $divisions = Division::get();
-         }
-
+            $total_records=Corpse::count();
+            $corpses=Corpse::latest('updated_at')->paginate(10);
+            $stations = Station::get();
+         }    
          $conditions= Condition::get();
          $manners= Manner::get();
          $anatomies= Anatomy::get();
          $ranks =  Rank::all();
-         return view('corpses.index', compact('funeralhomes', 'parishes','stations','conditions','manners','anatomies','divisions'));
-     
-        // return view('corpses.index');//->with($corpses);
+         return view('corpses.index', compact('funeralhomes','corpses', 'parishes','stations','conditions','manners','anatomies','total_records','divisions'));
     }
 
 
@@ -253,12 +253,12 @@ if(!auth()->user()->hasRole('SuperAdmin')){
             if ($corpse->first_name == "Unidentified") {
 
                 if ($corpse->suspected_name != '')
-                    $name = '*' . $corpse->suspected_name . '*';
+                    $name = '*' .ucfirst( $corpse->suspected_name). '*';
                 else {
                     $name = 'Unidentified';
                 }
             } else {
-                $name = $corpse->first_name . ' ' . $corpse->middle_name . ' ' . $corpse->last_name;
+                $name =ucfirst($corpse->first_name) . ' ' . ucfirst($corpse->middle_name) . ' ' . ucfirst($corpse->last_name);
             }
 
 
@@ -327,7 +327,7 @@ if(!auth()->user()->hasRole('SuperAdmin')){
 $count++;
     }
 
-    else  if(auth()->user()->hasRole('view')){
+    else  if(auth()->user()->hasRole('viewer')){
         $table .= '<tr>
         <td>' .'<a class="btn showViewModal btn-success btn-xs"   onclick="getViewId(' . $corpse->id . ')" > '.$corpse->id .' </a>'. '</td>'
         .'<td>' . $name . '</td>
@@ -341,7 +341,8 @@ $count++;
         .<td>' . $excess . '</td>
         .<td>
         <div class="btn-group">
-        </div>'
+        <a   class="btn btn-primary btn-xs "><i class="glyphicon glyphicon-bar"></i>none</a>' 
+        .'</div>'
     . '</td>
     </tr>';
 $count++;
@@ -426,9 +427,9 @@ return response($data);
     public function thirtyDaylist()
     {
         if(!auth()->user()->hasRole('SuperAdmin')){
-            $corpses = Corpse::where('division_id', auth()->user()->station->division->id)->paginate(10);
+            $corpses = Corpse::where('division_id', auth()->user()->station->division->id)->where('body_status',"Unclaimed")->paginate(10);
         }else{
-            $corpses = Corpse::paginate(10);
+            $corpses = Corpse::where('body_status',"Unclaimed")->paginate(10);
         }
 
         return view('corpses.thirtyDaylist')->withCorpses($corpses);
@@ -548,7 +549,7 @@ return response($data);
     {
         $validation = Validator::make($request->all(), [
             'corpse_id' => 'required',
-            'task' => 'required'
+            'task' => 'required|min:7|max:500', 
         ]);
 
         $error_array =array();
@@ -891,7 +892,7 @@ catch (\Throwable $th) {
         $page = 0;
         $pagination_link = '';
         $total_records =0;
-        $record_per_page=10;
+        $record_per_page=1;
         $total_recordsFromSearch=0;
         $total_recordsFromSearchCnt=0;
         $total_records= DB::table('corpses')->count();
@@ -919,7 +920,7 @@ catch (\Throwable $th) {
                     if ($value != '' && $count > 0 && $key != 'regNum') {
                         $this->countVal = 1;
                         $this->antherVariable = 2;
-                        if ($key == 'pauper_burial_approved' || $key == 'buried' || $key == 'division_id' ||  $key == 'anatomy_id' ||  $key == 'parish' || $key == 'funeralhome_id' ||  $key == 'station_id' ||   $key == 'sex' || $key == 'death_date' || $key == 'pickup_date' ||  $key == 'pauper_burial_requested_date' || $key == 'postmortem_date' || $key == 'burial_date') {
+                        if ($key == 'pauper_burial_approved' || $key == 'buried' || $key == 'division_id' ||  $key == 'anatomy_id' ||  $key == 'parish' || $key == 'funeralhome_id' ||  $key == 'station_id' ||   $key == 'sex'  ) {
                             $query .= " and corpses.$key ='$value'";
                         } else {
 
@@ -929,7 +930,7 @@ catch (\Throwable $th) {
                         $count = $count + 1;
                         $this->countVal = 1;
                         $this->antherVariable = 1;
-                        if ( $key == 'pauper_burial_approved' || $key == 'buried' || $key == 'division_id' ||  $key == 'anatomy_id' ||  $key == 'parish' || $key == 'funeralhome_id' ||  $key == 'station_id' ||  $key == 'sex' || $key == 'death_date' || $key == 'pickup_date' || $key == 'pauper_burial_requested_date' || $key == 'postmortem_date' || $key == 'burial_date') {
+                        if ( $key == 'pauper_burial_approved' || $key == 'buried' || $key == 'division_id' ||  $key == 'anatomy_id' ||  $key == 'parish' || $key == 'funeralhome_id' ||  $key == 'station_id' ||  $key == 'sex' ) {
                             $query .= " where corpses.$key = '$value'";
                         } else {
 
@@ -1234,12 +1235,12 @@ foreach ($total_recordsFromSearch as $key => $cnt) {
             if ($corpse->first_name == "Unidentified") {
 
                 if ($corpse->suspected_name != '')
-                    $name = '*' . $corpse->suspected_name . '*';
+                    $name = '*' . ucfirst($corpse->suspected_name) . '*';
                 else {
                     $name = 'Unidentified';
                 }
             } else {
-                $name = $corpse->first_name . ' ' . $corpse->middle_name . ' ' . $corpse->last_name;
+                $name = ucfirst($corpse->first_name ). ' ' .ucfirst($corpse->middle_name ). ' ' . ucfirst($corpse->last_name);
             }
 
              $anatomy= Anatomy::findOrFail($corpse->anatomy_id);
@@ -1258,7 +1259,7 @@ foreach ($total_recordsFromSearch as $key => $cnt) {
                 .<td>' . $corpse->buried . '</td>
                 .<td>' . $storagedays . '</td>
                 .<td>' . $excess . '</td>
-                .<td>
+                .<td width="6%">
                 <div class="btn-group no">
               <a href="corpses/' . $corpse->id . '/edit" class="btn btn-primary btn-xs "><i class="glyphicon glyphicon-edit"></i></a>' .
              '<a  href="#"  class="btn btn-danger  btn-xs " onclick="getId(' . $corpse->id . ')" >    <i class="glyphicon glyphicon-trash"></i></a>
@@ -1842,7 +1843,7 @@ public function checkUniqueCrNo(Request $request){
             'diary_no' => 'required|min:1|max:4',
             'entry_date' => 'required|date',
             'diary_type' => 'required',
-
+            'summary' => 'required|min:7|max:1000',
             'corpse_image' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
             'unidentified' => 'required',
             'last_name' => 'sometimes|min:2|max:15',
@@ -1850,12 +1851,15 @@ public function checkUniqueCrNo(Request $request){
             'suspected_name' => 'sometimes|max:15',
             'first_name' => 'min:3|max:15',
             'dob' => 'sometimes|date',
-            'dna_date' => 'sometimes|date',
+
+            'dna_date' => 'nullable|date',
+            'dna_result_date' => 'nullable|date', 
+            'dna_result' => 'nullable|min:7|max:500',
             'death_date' => 'nullable|date',
             'sex' => 'required',
             'nationality' => 'required|max:50',
             'address' => 'sometimes|max:150',
-
+            'volume_no' => 'nullable|string',
             'corpse_stn_id' => 'required',
             'pickup_date' => 'required|date',
             'pickup_location' => 'required|min:3|max:150',
@@ -1874,7 +1878,7 @@ public function checkUniqueCrNo(Request $request){
             'postmortem_date' => 'sometimes|date',
             'funeralhome_id' => 'required',
             'pathlogist' => 'sometimes|string',
-            'cause_of_Death' => 'sometimes|string',
+            'cause_of_Death' => 'sometimes|string|min:7|max:1000',
             'investigator_first_name' => 'required|min:2|max:15',
             'investigator_last_name' => 'required|min:2|max:15',
             'rank_id' => 'required',
@@ -1931,14 +1935,13 @@ public function checkUniqueCrNo(Request $request){
                 if ($corpse->unidentified === "Yes") {
                     $corpse->body_status = 'Unclaimed';
                 } else {
-                    $corpse->body_status = 'Claimed';
-                }
+                    $corpse->body_status = $request->input('body_status');
+                } 
                 $corpse->last_name = $request->input('last_name');
                 $corpse->middle_name = $request->input('middle_name');
                 $corpse->first_name = $request->input('first_name');
                 $corpse->suspected_name = $request->input('suspected_name');
-                $corpse->dna = $request->input('dna');
-                $corpse->dna_date = $request->input('dna_date');
+             
 
                 $corpse->dob = $request->input('dob');
                 $corpse->death_date = $request->input('death_date');
@@ -1994,6 +1997,7 @@ public function checkUniqueCrNo(Request $request){
                 $corpse->finger_print = $request->input('finger_print');
                 $corpse->finger_print_date = $request->input('finger_print_date');
                 $corpse->gazetted = $request->input('gazetted');
+                $corpse->volume_no = $request->input('volume_no');
                 $corpse->gazetted_date = $request->input('gazetted_date');
                 $Processing='No';
                 if ($request->input('pauper_burial_requested') == "No" || $request->input('pauper_burial_requested')=='') {
@@ -2045,8 +2049,31 @@ public function checkUniqueCrNo(Request $request){
 
                     $investigator->save();
                 } catch (\Throwable $th) {
-                    $error_array = ['Error, Something occurred while saving!'];
+                    $error_array = ['Error, Something occurred while saving Investigator!'];
                 }
+
+
+
+                try {
+                    
+                $summary = new Occurrence();        
+                $summary->corpse_id =  $corpse->id;
+                $summary->summary =    $request->input('summary'); 
+                 $summary->save();
+                } catch (\Throwable $th) {
+                    $error_array = ['Error, Something occurred while saving summary!'];
+                }
+ 
+
+
+                $dna =  new Dna();
+                $dna->corpse_id =  $corpse->id;
+                $dna->dna= $request->input('dna'); 
+                $dna->dna_request_date= $request->input('dna_date');
+                $dna->dna_result_date= $request->input('dna_result_date');
+                $dna->dna_result= $request->input('dna_result');
+                $dna->save();   
+
 
                 $success_output = '<div class="alert alert-success"> Saved Sucessfully! </div>';
                 $data = array(
@@ -2112,14 +2139,18 @@ public function checkUniqueCrNo(Request $request){
             // 'reference_id' => 'required',
 
             'corpse_image' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
-
+            'summary' => 'required|min:7|max:1000',
             'unidentified' => 'required',
             'last_name' => 'sometimes|min:2|max:15',
             'middle_name' => 'sometimes|max:15',
             'suspected_name' => 'sometimes|max:15',
             'first_name' => 'min:3|max:15',
             'dob' => 'sometimes|date',
-            'dna_date' => 'sometimes|date',
+            'volume_no' => 'nullable|string',
+            'dna_date' => 'nullable|date',
+            'dna_result_date' => 'nullable|date', 
+            'dna_result' => 'nullable|min:7|max:500',
+
             'death_date' => 'nullable|date',
             'sex' => 'required',
             'nationality' => 'required|max:50',
@@ -2143,7 +2174,7 @@ public function checkUniqueCrNo(Request $request){
             'postmortem_date' => 'sometimes|date',
             'funeralhome_id' => 'required',
             'pathlogist' => 'sometimes|string',
-            'cause_of_Death' => 'sometimes|string',
+            'cause_of_Death' => 'sometimes|string|min:7|max:1000',
 
             'dr_contact' => 'nullable|min:10|max:13',
             'dr_name' => 'nullable|min:3|max:50',
@@ -2211,17 +2242,18 @@ try{
 
 
             $corpse->unidentified =  $request->input('unidentified');
-            if ($corpse->unidentified === "Yes") {
-                $corpse->body_status = 'Unclaimed';
-            } else {
-                $corpse->body_status = 'Claimed';
-            }
+            $corpse->body_status = $request->input('body_status');
+            // if ($corpse->unidentified === "Yes") {
+            //     $corpse->body_status = 'Unclaimed';
+            // } else {
+            //     $corpse->body_status = 'Claimed';
+            // }
+            $corpse->unidentified = $request->input('unidentified');
             $corpse->last_name =  $request->input('last_name');
             $corpse->middle_name =  $request->input('middle_name');
             $corpse->first_name =  $request->input('first_name');
             $corpse->suspected_name =  $request->input('suspected_name');
-            $corpse->dna =  $request->input('dna');
-            $corpse->dna_date =  $request->input('dna_date');
+    
 
             $corpse->dob =  $request->input('dob');
             $corpse->death_date =  $request->input('death_date');
@@ -2253,7 +2285,7 @@ try{
             $corpse->finger_print_date =  $request->input('finger_print_date');
             $corpse->gazetted =  $request->input('gazetted');
             $corpse->gazetted_date =  $request->input('gazetted_date');
-
+            $corpse->volume_no = $request->input('volume_no');
  
             if($request->input('buried')!=''){
                 $corpse->buried =  $request->input('buried');
@@ -2277,6 +2309,37 @@ try{
                     $error_array = ['Error, occurred while updating !'];
                 }
 
+          
+         
+              // try{  
+                   
+                    $dna =  Dna::findOrFail($corpse->getDna->id);
+                    $dna->dna  = $request->input('dna'); 
+                    $dna->dna_request_date = $request->input('dna_date');
+                    $dna->dna_result_date = $request->input('dna_result_date');
+                    $dna->dna_result = $request->input('dna_result');
+                    $dna->update();                 
+                //   }
+                //    catch (\Throwable $th) {
+                //     return   $error_array = ['Error, occurred while updating Dna !'];
+                //    }
+
+
+
+
+
+                 try{  
+                   
+                    $summaryUpdate =  Occurrence::findOrFail($corpse->occurrence->id);
+                    $summaryUpdate->summary= $request->input('summary');
+                    $summaryUpdate->update(); 
+                
+                  }
+                   catch (\Throwable $th) {
+                    return   $error_array = ['Error, occurred while updating Occurrence !'];
+                   }
+
+            
             $corpseUpdated =   Corpse::findOrFail( $request->input('id'));
 
             $success_output = '<div class="alert alert-success"> Updated Sucessfully! </div>';
@@ -2464,7 +2527,9 @@ try{
         $manners= Manner::get();
         $anatomies= Anatomy::get();
         $ranks =  Rank::get();
-        return view('corpses.edit', compact('corpse','funeralhomes', 'ranks','stations','conditions','manners','anatomies','investigators'));
+        $summary= Occurrence::where('corpse_id', $id)->get();
+
+        return view('corpses.edit', compact('corpse','summary','funeralhomes', 'ranks','stations','conditions','manners','anatomies','investigators'));
 
        
     }
@@ -2608,6 +2673,117 @@ try{
      * @return void
 
      */
+    
+
+
+    public function messageSuperAdmin(Request $request)
+
+    {
+
+         $validation = Validator::make($request->all(), [
+            'subject' => 'required|min:3|max:90', 
+            'message' => 'required|min:7|max:500',           
+            'corpse_id' => 'required'
+        ]);
+        $error_array = array();
+        $success_output = '';
+        if ($validation->fails()) {
+            foreach ($validation->messages()->getMessages() as $field_name => $messages) {
+                $error_array[] = $messages;
+            }
+        } else {
+
+
+
+            $messageSuperAdmin = new Message();
+            $messageSuperAdmin->user_id = auth()->user()->id;        
+            $messageSuperAdmin->corpse_id =   $this->test_input( $request->input('corpse_id'));
+            $messageSuperAdmin->subject =    $this->test_input( $request->input('subject'));
+            $messageSuperAdmin->message =   $this->test_input($request->input('message')); 
+        try{
+            $messageSuperAdmin->saveOrFail();
+            $success_output= " Message sent successfully";
+            }
+            catch (\Throwable $th) {
+                $error_arra=' Something occurred while sending message  !';
+            }
+    
+            $sendTo = User::whereHas('roles', function ($query) {
+                $query->where('name', '=', 'superAdmin');
+            })->get();
+    
+            $data = array(
+                'id' => $messageSuperAdmin->corpse_id,
+                'type' => 'message',
+                "from" => auth()->user()->email
+            );
+    
+            try{
+                if (\Notification::send($sendTo, new newCorpseNotification($data))) {
+                    
+                }
+             }
+            catch (\Throwable $th) {
+                $error_arra=' Something occurred while retrieving record!';
+            }
+    
+         
+    
+        }
+        $output = array(
+            'error'     =>  $error_array,
+            'success'   =>  $success_output
+        );
+    
+        echo json_encode($output);
+    
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function taskPost(Request $request)
 
@@ -2619,11 +2795,17 @@ try{
         $task->corpse_id =   $this->test_input( $request->input('corpse_id'));
         $task->task =   $this->test_input($request->input('task'));
         $task->modify_by = 0;
+        $error_array = '';
+        $error_notification = '';
+        $success_output = '';
     try{
         $task->saveOrFail();
+        $success_output = '<div class="alert alert-success">  Task sent sucessfully! </div>';
+
         }
         catch (\Throwable $th) {
-        return ['error'=>' Something occurred while saving task !'];
+            $error_array ='<div class="alert alert-danger"> Something occurred while saving Task! </div>';
+        // return ['error'=>' Something occurred while saving task !'];
         }
         $sendTo = User::where('id', '=', $task->address_to_id)->get();
         $data = array(
@@ -2638,15 +2820,35 @@ try{
             }
          }
         catch (\Throwable $th) {
-        return ['error'=>' Something occurred while retrieving record!'];
+            $error_notification =  '<div class="alert alert-info">Task sent. But something occurred while sending notification </div>';
         }
-
-        return  response()->json(['Task notification sent successfully.']);
+        $output = array(
+            'error'     =>  $error_array,
+            'success'   =>  $success_output,
+            'error_notification'=>$error_notification
+        );
+    
+        return   json_encode($output);
+       // return  response()->json(['Task notification sent successfully.']);
     }
     //////////////////////////////////////////////////////
 
 
+    
 
+
+    public function getAllMessages(Request $request)
+
+    {
+        try{
+        $data = DB::table('messages')->where('corpse_id',$this->test_input( $request->input('corpse_id')))->orderBy('created_at', 'desc')
+            ->get();
+        }
+        catch (\Throwable $th) {
+           return ['error'=>' Something occurred while retrieving messages!'];
+        }
+        return  response()->json($data);
+    }
 
     public function getTasks(Request $request)
 
@@ -2662,6 +2864,21 @@ try{
     }
 
 
+
+
+
+    public function getSummary(Request $request)
+
+    {
+        try{
+        $data = DB::table('occurrences')->where('corpse_id',$this->test_input( $request->input('corpse_id')))->orderBy('created_at', 'desc')
+            ->get();
+        }
+        catch (\Throwable $th) {
+           return ['error'=>' Something occurred while retrieving summary!'];
+        }
+        return  response()->json($data);
+    }
 
 
 

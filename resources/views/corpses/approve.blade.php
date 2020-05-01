@@ -41,11 +41,11 @@
 
 <link rel="stylesheet" href="{{asset('dist/task.css')}}">
 
-<div class="container">
+<div class="container " style="min-height:700px;">
 
 <div class="col-lg-10 col-lg-offset-1">
 
-    <h3><i class="fa fa-corpses"></i> Pauper's Burial {{$listType}} List </h3>
+    <h2><i class="fa fa-list-ul" aria-hidden="true"></i>  Pauper's Burial {{$listType}} List </h2>
     <div id="outputTable"></div>
 
     <h1 style="color:#1E90FF">
@@ -100,12 +100,12 @@ $name='';
 if ($corpse->first_name == "Unidentified") {
 
 if ($corpse->suspected_name != '')
-  $name = '*' . $corpse->suspected_name . '*';
+  $name = '*' .ucfirst( $corpse->suspected_name) . '*';
 else {
   $name = 'Unidentified';
 }
 } else {
-$name = $corpse->first_name . ' ' . $corpse->middle_name . ' ' . $corpse->last_name;
+$name = ucfirst($corpse->first_name) . ' ' .ucfirst( $corpse->middle_name) . ' ' . ucfirst($corpse->last_name);
 }
 // $corpse->created_at->format('F d, Y h:ia')
 
@@ -153,20 +153,22 @@ $excess = 0;
                     <td>{!! $corpse->pickup_date!!}</td> 
                     @if ($corpse->pauper_burial_approved =='No')
                     <td  class=" text-danger   " >
-                        <h3 class="label label-danger"><i class="fa fa-clock-o"></i>    {!! $corpse->pauper_burial_approved!!}</h3>
+                        <h3 class="label label-danger"><i class="fa fa-clock-o"></i>    Denied </h3>
                     </td> 
                     @else
-                    <td  class=" text-info   " >
-                        <h3 class="label label-info"><i class="fa fa-clock-o"></i>    {!! $corpse->pauper_burial_approved!!}</h3>
+                    <td  class=" text-warning   " >
+                        <h3 class="label label-warning"><i class="fa fa-clock-o"></i>    {!! $corpse->pauper_burial_approved!!}</h3>
                     </td>  
                     @endif                               
                     <td>{!!  $storagedays!!}</td>
                     <td>{!!   $excess!!}</td>
-                 <td nowrap>
+                 <td  >
                   <div class='btn-group'>                     
                               @if ( $listType=="Request Denied" ||  $listType=="No-Request" )
-                                <a onclick="makeRequest({!!$corpse->id!!});"  class=" btn btn-success btn-xs  pull-right small-box-footer btn_makeRequest"> Make Request </a>
-                              @elseif ( $listType=="Request")
+                              @hasrole('SuperAdmin|Admin|writer')
+                              <a onclick="makeRequest({!!$corpse->id!!});"  class=" btn btn-success btn-xs  pull-right small-box-footer btn_makeRequest"><i class="fa fa-paper-plane-o" aria-hidden="true"></i>  Make Request </a>
+                              @endrole
+                             @elseif ( $listType=="Request")
                                 @hasrole('SuperAdmin')
                                 <a onclick="approved({!!$corpse->id!!});" class=" btn_approve btn btn-success btn-xs small-box-footer "> Approve  </a>
                                 <a href="#" onclick="deny({!!$corpse->id!!});" class='btn   btn-danger btn-xs'> Deny </a>
@@ -183,7 +185,7 @@ $excess = 0;
            
             </tbody>
             @else
-            <h4 style="color:dodgerblue">No Data.. </h4>
+            <td colspan='8'><h4 style="color:dodgerblue">No Data Found</h4></td>
         @endif
         </table>
 
@@ -214,13 +216,13 @@ $excess = 0;
                       <div id="vacationStatusUpdate"  style="color:green;">  </div>
                       <span class="taskMess"></span>
                       <h4 id="vacationStatusTxt" > Enter a Task</h4> <span style="color:red" class="task_error"></span>
-                      <input type="text" class="task form-control"name="task" id="task" ><br>
-
+                  
+                      <textarea name="task" id="task"  class=" task form-control"  rows="7" id="message-text"></textarea>
                       </div>
                    <hr>
                    <button id="btnConfirmVacation" class="saved hide_original_submitTask_btn" >Submit</button>  &emsp;
-                   <button id="btnConfirmVacation" class=" hide_deny_task_btn " onclick="SubmitTask();" >Deny</button>  &emsp;
-               <button id="cancelVacation" onclick=" myFunction();" class = "cancelTask yes">Cancel</button> &emsp;
+                   <button id="btnConfirmVacation" class=" hide_deny_task_btn " onclick="SubmitTask();" >  Deny  <i class="fa fa-thumbs-down" aria-hidden="true"></i></button>  &emsp;
+               <button id="cancelVacation" onclick=" myFunction();" class = "cancelTask yes">Cancel <i class="fa fa-ban" aria-hidden="true"></i></button> &emsp;
           </div>
            <div>
            </div>
@@ -229,7 +231,7 @@ $excess = 0;
      </div>
 
 <input type="hidden" id="getId">
-
+<br><br><br><br><br><br><br><br><br><br><br><br>
 @endsection 
 
 

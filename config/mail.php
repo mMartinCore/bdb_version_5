@@ -56,8 +56,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'jcfdodsystem@gmail.com'),
-        'name' => env('MAIL_FROM_NAME', 'jcfdodsystem'),
+        'address' => env('MAIL_FROM_ADDRESS', 'jcfdbdsystem@gmail.com'),
+        'name' => env('MAIL_FROM_NAME', 'jcfdbdsystem'),
     ],
 
     /*

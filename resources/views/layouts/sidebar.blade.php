@@ -29,6 +29,10 @@
       </span>
   </a>
   <ul class="treeview-menu">
+    <li class="{{ Request::is('feedbacks*') ? 'active' : '' }}">
+      <a href="{!! route('feedbacks.index') !!}"><i class="fa fa-comments" aria-hidden="true"></i><span>Feedback</span></a>
+  </li>
+  
     <li><a href="{{ route('users.create') }}"><i class="fa fa-user-plus" aria-hidden="true"></i>Create Users</a></li>
 
     <li><a href="{{ route('users.index') }}"><i class="fa fa-list-ol" aria-hidden="true"></i>User List</a></li>

@@ -18,7 +18,9 @@ class CreateTasksTable extends Migration
             $table->integer('user_id')->unsigned()->index();
             $table->integer('corpse_id')->unsigned()->index();
             $table->integer('address_to_id')->unsigned()->index();
-            $table->string('task',200);$table->integer('modify_by');
+            $table->string('status')->nullable();
+            $table->longText('task');
+            $table->integer('modify_by')->nullable();
             $table->timestamps();
         });
     }

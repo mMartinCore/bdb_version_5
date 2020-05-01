@@ -191,6 +191,7 @@
                     <div class="col col-sm-2">
                         <small> <Label>Anatomy</Label></small>
                         <select name="anatomy_id" class="form-control anatomy" id="anatomy_id">
+                            <option value="">Select an Option</option>
                             @foreach($anatomies as $anatomy)
                             <option value='{{ $anatomy->id }}'>{{ $anatomy->anatomy}}</option>
                            @endforeach
@@ -280,10 +281,17 @@
                 {{-- {!! Form::submit('', ['class' => 'saved btn  btn-primary']) !!} --}}
               </div>
           </div>
-      </div>
-      <input type="hidden" name="page" id="pageNumForm2" >
+      </div> 
 
       {{-- <input type="hidden" id="order_by_last_nameForm2"  value="desc" name="order_by_last_name"> --}}
+      
+
+      <input type="hidden" name="page" id="page"/>
+      <input type="hidden" name="query" id="query"/>
+      <input type="hidden" name="sort_by" id="sort_by"/>
+      <input type="hidden" name="sort_type" id="sort_type"  />
+   
       {!! Form::close() !!}
 
 </div>
+ 

@@ -12,12 +12,12 @@
 
 </style>
 
-    <div class="container my_container" >
+    <div class="container my_container"   style="min-height:900px;"> 
     <br><br>
 
        <div class="row">
 
-    @hasrole('SuperAdmin')
+    @hasrole('SuperAdmin|Admin')
         <div class="col-sm-3 col-xs-6">
           <!-- small box -->
           <div class="small-box bg-red">
@@ -77,11 +77,11 @@
             <a href="{!! route('corpses.notApprove') !!}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
-        <!-- ./col -->
+        <!-- ./col --> 
+        @endrole
       <br>
 
-
-
+      @hasrole('SuperAdmin')
 
             <div class="panel-body ">
                 <div class="row ">
@@ -108,6 +108,7 @@
             <div class="row">
                 @hasrole('SuperAdmin|Admin|viewer|writer')
                 <div class="col-sm-12">
+                  <br>
                 {!! $bar_station->html() !!}
                 </div>
              @endrole

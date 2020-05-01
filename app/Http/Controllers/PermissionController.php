@@ -132,7 +132,7 @@ class PermissionController extends Controller {
              'Cannot delete this Permission!');
         }
 
-        $permission->delete();
+      //  $permission->delete();
 
         return redirect()->route('permissions.index')
             ->withFlash_message('flash_message',

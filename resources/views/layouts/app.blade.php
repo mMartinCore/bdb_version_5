@@ -6,7 +6,7 @@ This is a starter template page. Use this page to start your new project from
 scratch. This page gets rid of all links and provides the needed markup only.
 -->
 <html>
-<head>
+<head> 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
  
@@ -302,17 +302,19 @@ desired effect
   <script language="javascript">
 
     if ( $(window).width() >= 1280 && $(window).width() <= 1536) {
-        document.write("<style>body{zoom:90%;}</style>");
+
+        document.write("<style>body{zoom:88%;}</style>");
     }
    else if ( $(window).width()>= 1180   && $(window).width() < 1280) {
        document.write("<style>body{zoom:75%;}</style>");
    }
    else if ( $(window).width()>=750  && $(window).width() < 1080 ) {
-       document.write("<style>body{zoom:65%;}</style>");
+       document.write("<style>body{zoom:68%;}</style>");
    }
    else if ( $(window).width() <= 750 ) {
-       document.write("<style>body{zoom:45%;}</style>");
+       document.write("<style>body{zoom:50%;}</style>");
    }else{
+     
       }
 </script>
 
@@ -488,7 +490,7 @@ desired effect
 
 
 
-  <div class="content-wrapper">
+  <div class="content-wrapper ">
 
            <div>
 
@@ -547,7 +549,7 @@ desired effect
 
   <!-- Main Footer -->
   <footer class="main-footer" >  
-    <strong>Copyright &copy; <?php echo date('Y') ?> <a href="#">DOB System</a>.</strong> All rights reserved.
+    <strong>Copyright &copy; <?php echo date('Y') ?> <a href="#">DBD System</a>.</strong> All rights reserved.
   </footer>
  
 
@@ -569,7 +571,11 @@ desired effect
      <script>
          CKEDITOR.replace( 'article-ckeditor' );
      </script>
+          @livewireScripts
 </body>
+
+
+
 
 <!-- AdminLTE App -->
 <script src="{{ asset('dist/js/adminlte.min.js')}}"></script>
@@ -610,8 +616,7 @@ desired effect
           </div>
           <footer  style="background-color:#3c8dbc;" class="demo-footer">
              <button type="button" class="btn  btn-danger btn-lg btn-block" data-dismiss="modal" >Close</button>
-
-               </footer>
+          </footer>
 
         </div><!-- modal-content -->
       </div><!-- modal-dialog -->
@@ -632,8 +637,8 @@ desired effect
 
 
 function getViewId(id) {
-
-$("#load_show_view").load("http://127.0.0.1:8000/corpses/"+id, function(responseTxt, statusTxt, xhr){
+  var url =window.location.protocol+"//"+window.location.hostname+"/corpses/"+id;
+$("#load_show_view").load(url, function(responseTxt, statusTxt, xhr){
 if(statusTxt == "success")
 {
     document.getElementById('demo02').click(); // Works!
@@ -669,8 +674,8 @@ return false;
 
 
 function getViewId_view_Notify(id) {
-
-$("#load_show_view").load("http://127.0.0.1:8000/corpses/"+id, function(responseTxt, statusTxt, xhr){
+  var url =window.location.protocol+"//"+window.location.hostname+"/corpses/"+id;
+$("#load_show_view").load(url, function(responseTxt, statusTxt, xhr){
 if(statusTxt == "success")
 {
     document.getElementById('demo02').click(); // Works!

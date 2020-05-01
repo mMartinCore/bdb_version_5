@@ -35,7 +35,10 @@
 </li>
 
 
- 
+<li class="{{ Request::is('feedbacks*') ? 'active' : '' }}">
+    <a href="{!! route('feedbacks.create') !!}"><i class="fa fa-comments" aria-hidden="true"></i><span>Feedback</span></a>
+</li>
+
 
 @else
 

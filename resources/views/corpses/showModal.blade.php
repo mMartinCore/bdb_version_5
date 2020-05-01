@@ -72,8 +72,8 @@
 
 
 function getViewId(id) {
-
-$("#load_show_view").load("http://127.0.0.1:8000/corpses/"+id, function(responseTxt, statusTxt, xhr){
+    var url =window.location.protocol+"//"+window.location.hostname+"/corpses/"+id;
+$("#load_show_view").load(url, function(responseTxt, statusTxt, xhr){
     if(statusTxt == "success")
         {
             document.getElementById('demo02').click(); // Works!
@@ -109,8 +109,8 @@ $("#load_show_view").load("http://127.0.0.1:8000/corpses/"+id, function(response
 
 
 function getViewId_view_Notify(id) {
-
-$("#load_show_view").load("http://127.0.0.1:8000/corpses/"+id, function(responseTxt, statusTxt, xhr){
+    var url =window.location.protocol+"//"+window.location.hostname+"/corpses/"+id;
+$("#load_show_view").load(url, function(responseTxt, statusTxt, xhr){
     if(statusTxt == "success")
         {
             document.getElementById('demo02').click(); // Works!

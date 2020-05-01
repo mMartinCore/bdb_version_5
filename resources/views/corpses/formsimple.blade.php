@@ -83,10 +83,10 @@
                 </div>
           </div>
 
-
-          <input type="hidden" name="page" id="pageNumForm1" >
-
-          <input type="hidden"  name="order_by_last_name" id="order_by_last_nameForm1" value="desc">
+          <input type="hidden" name="page" id="SimpleForm_page"/>
+          <input type="hidden" name="query" id="SimpleForm_query"/>
+          <input type="hidden" name="sort_by" id="SimpleForm_sort_by"/>
+          <input type="hidden" name="sort_type" id="SimpleForm_sort_type"  />
 
               {!! Form::close() !!}
           </div>

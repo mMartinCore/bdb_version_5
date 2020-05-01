@@ -2,14 +2,17 @@
 
 @section('content')
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <script>
     var is_form1_on=true;
     $(document).ready(function(){
 
       $("#flip").click(function(){
-        is_form1_on=true;
+        is_form1_on=false;
+ 
        $('.opendForm2')[0].reset();
        $('#postForm')[0].reset();
         $("#panel").slideToggle("slow");
@@ -18,7 +21,8 @@
       });
 
       $("#flip2").click(function(){
-        is_form1_on=false;
+        is_form1_on=true;
+        
        $('#postForm')[0].reset();
         $('.opendForm2')[0].reset();
         $("#panel").slideToggle("slow");
@@ -115,8 +119,6 @@ top: 290%;
              </span>
 
              @include('corpses.formAdvance')
-
-
               </div>
          </section>
 
@@ -131,6 +133,9 @@ top: 290%;
         <div class="clearfix"></div>
         <div class="box box-primary">
             <div class="box-body">
+
+
+              
                     @include('corpses.table')
             </div>
         </div>

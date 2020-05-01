@@ -82,7 +82,27 @@
     -moz-box-sizing: content-box;
     box-sizing: content-box;
     margin: 10px;
-    height: 400px;
+    height: auto;
+    border: none;
+    font: normal 14px/1 Tahoma, Geneva, sans-serif;
+    color: black;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    background:ghostwhite
+    -webkit-box-shadow: 5px 5px 8px 2px rgba(0,0,0,0.4) ;
+    box-shadow: 5px 5px 8px 2px rgba(0,0,0,0.4) ;
+    /* text-shadow: 1px 1px 2px rgba(0,0,0,0.5) ; */
+    -webkit-border-radius: 40px 0px 40px 0px;
+    -moz-border-radius: 40px 0px 40px 0px;
+    border-radius: 40px 0px 40px 0px;
+    }
+    
+    .blueBoxInvestigator {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    margin: 10px;
+    height:auto;
     border: none;
     font: normal 14px/1 Tahoma, Geneva, sans-serif;
     color: black;
@@ -98,12 +118,10 @@
     }
 
 </style>
-
-    <section class="content-header">
+ <section class="content-header">
         <div class="title"><h4>   <i class="fa fa-pencil-square-o" aria-hidden="true"></i>  Edit   Corpse </h4></div> 
-   
-   </section>
-
+    </section>
+    @include('corpses.step')
    {!! Form::open(['route' => 'corpses.editCorpse','id'=>'postForm', 'enctype' => 'multipart/form-data']) !!}
    {{csrf_field()}}
 
@@ -112,6 +130,7 @@
    <div class="container"  >
 
     <div class="container" >
+        
         <span id="form_output"></span>
 <span class="CoprseSection">
 
@@ -125,7 +144,7 @@
     {!! Form::label('unidentified', 'Unidentified:') !!}<small id="Error_unidentified"></small>
     <select name="unidentified" class="form-control unidentified" onchange="is_unidentiied()" id="unidentified">
         <option value="{{$corpse->unidentified}}">{{$corpse->unidentified}}</option>
-        <option value="">Select an Option</option>
+        
             <option value="Yes">Yes</option>
             <option value="No">No</option>
         </select>
@@ -183,11 +202,21 @@
 <div class="form-group col-sm-3">
     {!! Form::label('sex', 'Gender:') !!} <small id="Error_sex"></small>
     <select name="sex" class="form-control sex" onchange="gender()" id="sex">
-        <option value="{{$corpse->sex}}">{{$corpse->sex}}</option>
-            <option value="">Select a Gender</option>
-            <option value="Male">Male</option>
+        <option value="{{$corpse->sex}}">{{$corpse->sex}}</option> 
+        @if ($corpse->sex=="Male")
             <option value="Female">Female</option>
             <option value="Unknown">Unknown</option>
+        @elseif($corpse->sex=="Female") 
+        <option value="Male">Male</option>
+        <option value="Unknown">Unknown</option>      
+        @else
+        <option value="Male">Male</option>         
+        <option value="Female">Female</option>
+  
+        @endif
+
+           
+            
         </select>
 
 </div>
@@ -197,8 +226,7 @@
 <div class="form-group col-sm-3">
     {!! Form::label('corpseCountry', 'Country of Nationality:') !!} <small id="Error_corpseCountry"></small>
     <select name="nationality" class="form-control corpseCountry" onchange="country()" id="corpseCountry" >
-        <option value="{{$corpse->nationality}}">{{$corpse->nationality}}</option>
-            <option value="">Select a Country </option>
+        <option value="{{$corpse->nationality}}">{{$corpse->nationality}}</option> 
             <option value="Afghanistan">Afghanistan</option>
             <option value="Åland Islands">Åland Islands</option>
             <option value="Albania">Albania</option>
@@ -468,7 +496,7 @@
 
 
 <!-- Death Date Field -->
-<div class="form-group col-sm-3">
+<div class="form-group col-sm-6">
         {!! Form::label('death_date', 'Death Date:') !!}<small id="Error_death_date"></small>
         {!! Form::date('death_date', $corpse->death_date, ['class' => 'form-control death_date','id'=>'death_date']) !!}
 
@@ -488,11 +516,10 @@
 
 
 
-<div class="form-group  col-sm-3 {{$errors->has('corpse_stn_id') ? 'has-error' :''}}">
+<div class="form-group  col-sm-6 {{$errors->has('corpse_stn_id') ? 'has-error' :''}}">
         {{Form::label('corpse_stn_id', 'Police Station :')}}       <small id="Error_corpse_stn_id">&nbsp;</small>
         <select name="corpse_stn_id" value="{{Request::old('corpse_stn_id')}}" onchange="corpse_stn()" class="form-control corpse_stn_id" >
-            <option value="{{$corpse->station->id}}">{{$corpse->station->station}}</option>
-            <option value="">Select a Station</option>
+            <option value="{{$corpse->station->id}}">{{$corpse->station->station}}</option> 
             @foreach($stations as $station)
 
               @if (auth()->user()->hasRole('SuperAdmin'))
@@ -599,7 +626,7 @@
         {!! Form::label('condition', 'Condition:') !!} <small id="Error_condition"></small>             
             <select name="condition" value="{{Request::old('condition')}}" onchange="CorpseCondition()" class="form-control condition"  id="condition"> <small id="Error_condition"></small>
                 <option value="{{$corpse->condition_id}}">{{$corpse->condition->condition}}</option>
-                <option value="">Select a Option</option>
+                
                     @foreach($conditions as $condition)
                     @if ($corpse->condition_id!= $condition->id)
                     <option value='{{ $condition->id }}'>{{ $condition->condition}}</option>
@@ -616,10 +643,18 @@
     {!! Form::label('type_death', 'Type Death:') !!}<small id="Error_type_death"></small>
     <select name="type_death" class="form-control type_death"  onchange="typeDeath()" id="type_death">
         <option value="{{$corpse->type_death}}">{{$corpse->type_death}}</option>
-            <option value="">Select an Option</option>
-            <option value="Natural">Natural</option>
-            <option value="Unnatural">Unnatural</option>
-            <option value="Unknown">Unknown</option>
+            
+
+        @if ($corpse->type_death=="Natural") 
+        <option value="Unnatural">Unnatural</option>
+        <option value="Unknown">Unknown</option>
+        @elseif($corpse->type_death=="Unnatural") 
+        <option value="Natural">Natural</option> 
+        <option value="Unknown">Unknown</option>    
+        @else
+        <option value="Natural">Natural</option>
+        <option value="Unnatural">Unnatural</option>  
+        @endif 
         </select>
 </div>
 
@@ -627,8 +662,7 @@
 <div class="form-group col-sm-3">
     {!! Form::label('manner_death', 'Manner Death:') !!}<small id="Error_manner_death"></small>
         <select name="manner_death" class="form-control manner_death"  onchange="mannerDeath()" id="manner_death"  value="{{Request::old('manner_death')}}">  
-            <option value="{{$corpse->manner_id}}">{{$corpse->manner->manner}}</option>
-            <option value="">Select a Option</option>
+            <option value="{{$corpse->manner_id}}">{{$corpse->manner->manner}}</option>            
              @foreach($manners as $manner_death)
                 @if ($corpse->manner_id != $manner_death->id)
                 <option value='{{ $manner_death->id }}'>{{ $manner_death->manner}}</option>
@@ -641,8 +675,7 @@
 <div class="form-group col-sm-3">
     {!! Form::label('anatomy', 'Anatomy:') !!}<small id="Error_anatomy"></small> 
         <select name="anatomy" class="form-control anatomy"  onchange="anotomMethod()" id="anatomy"  value="{{Request::old('anatomy')}}">  
-            <option value="{{$corpse->anatomy_id}}">{{$corpse->anatomy->anatomy}}</option>
-            <option value="">Select a Option</option>
+            <option value="{{$corpse->anatomy_id}}">{{$corpse->anatomy->anatomy}}</option>            
              @foreach($anatomies as $anatomy)
                 @if ($corpse->anatomy_id != $anatomy->id)
                 <option value='{{ $anatomy->id }}'>{{ $anatomy->anatomy}}</option>
@@ -663,7 +696,7 @@
 
 
 
-<div class="form-group col-sm-3">
+<div class="form-group col-sm-6">
     {!! Form::label('next_of_kin', 'Next of kin:') !!}<small id="Error_next_of_kin"></small>
     {!! Form::text('next_of_kin', $corpse->next_of_kin, ['class' => 'next_of_kin  form-control']) !!}
 </div>
@@ -721,26 +754,36 @@
 <div class="well" style="background:white">
         <h4> Investigator Section</h4>
 
-        <div    class=" row blueBox">
-<br><br> <br>
+        <div    class=" row blueBoxInvestigator">
+<br><br> 
 
 <div id="deletOutPut">
 </div>
-<div class="form-group col-sm-12">
-    <h4 > To reassign a new investigator <button class="btn btn-default" id="btngetReassign" type="submit"> <i class="fa fa-user-circle-o" aria-hidden="true"></i> Assign new I.O</button></h4>
-    <hr>
-    <h4> click on the edit button on the right of Investigator detail below for editing</h4>
-<hr>
-<h5 id="getInvest"></h5>
+<div class="form-group col-sm-12 col-md-offet-2">
+    <button class="btn btn-default btn-sm  "  id="btngetReassign" type="submit"><i class="fa fa-plus-circle" aria-hidden="true"></i> Assign new I.O</button>
+     <br><br> 
+       <div id="getInvest">
+    
+       </div>
+<hr> 
+    <div class="form-group col-sm-12" >
+        
+        <label for="exampleFormControlTextarea1">Case Summary <small class="mb-4px">Here you are required to enter the summary of the case.</small></label><span id="Error_summary"></span>
+      
+        <textarea   name="summary" class="form-control summary" id="summary" rows="7">{{$corpse->occurrence->summary }}</textarea> 
+      
+    </div>
+
 
 </div>
 
- 
-              <br><br>
+
+
+
               <div class="form-group col-sm-12">
                 <button id="goback_prseSection2" class="btn btn-default"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Previous</button>&emsp;<button  class="btn btn-primary" id="MorgueSection">Next <i class="fa fa-arrow-circle-right" aria-hidden="true"></i> </button>
              </div>
-           <br><br>
+           <br>
            </div>
         </div>
            </span>
@@ -791,12 +834,18 @@
 <div class="form-group col-sm-3">
         {!! Form::label('postmortem_status', 'Postmortem Status:') !!}<small id="Error_postmortem_status"></small>
         <select name="postmortem_status" class="form-control postmortem_status" id="postmortem_status"  onchange="postmortemStatus()">
-            <option value="{{$corpse->postmortem_status}}">{{$corpse->postmortem_status}}</option>
-            <option value="">Select an Option</option>
-                <option value="Not Required">Not Required</option>
+            <option value="{{$corpse->postmortem_status}}">{{$corpse->postmortem_status}}</option>  
+            @if ($corpse->postmortem_status=="Not Required")
                 <option value="Pending">Pending</option>
                 <option value="Completed">Completed</option>
-            </select>
+            @elseif ($corpse->postmortem_status=="Pending")    
+                <option value="Not Required">Not Required</option> 
+                <option value="Completed">Completed</option>
+            @else
+            <option value="Pending">Pending</option>
+            <option value="Not Required">Not Required</option>            
+            @endif                  
+         </select>
     </div>
 
     <!-- Postmortem Date Field -->
@@ -819,10 +868,12 @@
     <div class="form-group  col-sm-3">
             {!! Form::label('body_status', ' Body Status:') !!}<small id="Error_body_status"></small>
             <select name="body_status" class="form-control body_status" id="body_status"  onchange="deadBodyStatus()">
-                <option value="{{$corpse->body_status}}">{{$corpse->body_status}}</option>
-                    <option value="">Select an Option</option>
-                    <option value="Unclaimed">Claimed</option>
+                <option value="{{$corpse->body_status}}">{{$corpse->body_status}}</option> 
+                  @if ($corpse->body_status=="Claimed")                      
                     <option value="Unclaimed">Unclaimed</option>
+                  @else
+                  <option value="Claimed">Claimed</option>
+                  @endif              
                 </select>
     </div>
 
@@ -835,12 +886,12 @@
     <hr>
 
 
-   <div class="form-group col-sm-3">
+   <div class="form-group col-sm-3 "  >
     {!! Form::label('dr_name', 'Dr. Name:') !!}<small id="Error_dr_name"></small>
     {!! Form::text('dr_name', $corpse->dr_name, ['class' => 'dr_name  form-control']) !!}
 </div>
 
-
+ 
 
 <div class="form-group col-sm-3">
     {!! Form::label('dr_contact', 'Dr Contact:') !!} <small id="Error_dr_contact"></small>
@@ -852,10 +903,12 @@
     <div class="form-group  col-sm-6 {{$errors->has('funeralhome_id') ? 'has-error' :''}}">
             {!! Form::label('funeral_home', 'Funeral Home:') !!}<small id="Error_funeralhome_id"></small>
             <select name="funeralhome_id" value="{{Request::old('funeralhome_id')}}" class="form-control funeralhome_id" onchange="funeralHome()" >
-                <option value="{{$corpse->funeralhome_id}}">{{$corpse->funeralhome->funeralhome}}</option>
-                <option value="">Select a Funeral Home </option>
+                <option value="{{$corpse->funeralhome_id}}">{{$corpse->funeralhome->funeralhome}}</option> 
                           @foreach($funeralhomes as $funeralhome)
-                                 <option value='{{$funeralhome->id }}'>{{ $funeralhome->funeralhome}}</option>
+                          @if ($corpse->funeralhome_id != $funeralhome->id)
+                          <option value='{{$funeralhome->id }}'>{{ $funeralhome->funeralhome}}</option> 
+                          @endif  
+                              
                           @endforeach
             </select>
         </div>
@@ -865,7 +918,7 @@
     <!-- Cause Of Death Field -->
     <div class="form-group col-sm-12 col-lg-12">
         {!! Form::label('cause_of_Death', 'Cause Of Death:') !!}<small id="Error_cause_of_Death"></small>
-        <textarea class="form-control cause_of_Death" id="cause_of_Death" name="cause_of_Death"  cols="120" rows="2">{{$corpse->cause_of_Death}}
+        <textarea class="form-control cause_of_Death" id="cause_of_Death" name="cause_of_Death"  cols="120" rows="4">{{$corpse->cause_of_Death}}
          </textarea>
     </div>
 
@@ -906,10 +959,12 @@
 <div class="form-group col-sm-3">
     {!! Form::label('finger_print', 'Finger Print:') !!} <small id="Error_finger_print"></small>
     <select name="finger_print" class="form-control finger_print" id="finger_print" onchange="fingerPrint()">
-        <option value="{{$corpse->finger_print}}">{{$corpse->finger_print}}</option>
-            <option value="">Select an Option</option>
-            <option value="Yes">Yes</option>
+        <option value="{{$corpse->finger_print}}">{{$corpse->finger_print}}</option> 
+            @if ($corpse->finger_print=="Yes")
             <option value="No">No</option>
+            @else
+            <option value="Yes">Yes</option>
+            @endif            
         </select>
 </div>
 
@@ -933,39 +988,18 @@
 
 
 
-<div class="form-group col-sm-3">
-    {!! Form::label('dna', 'DNA:') !!} <small id="Error_dna"></small>
-    <select name="dna" class="form-control dna" id="dna" onchange="is_dna()">
-        <option value="{{$corpse->dna}}">{{$corpse->dna}}</option>
-            <option value="">Select an Option</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        </select>
-</div>
 
-<!-- Finger Print Date Field -->
-<div class="form-group col-sm-3">
-    {!! Form::label('dna_date', 'DNA Date:') !!}<small id="Error_dna_date"></small>
-    {!! Form::date('dna_date', $corpse->dna_date, ['class' => 'form-control dna_date','id'=>'dna_date']) !!}
-</div>
-
-@section('scripts')
-    <script type="text/javascript">
-        $('#dna_date').datetimepicker({
-            format: 'YYYY-MM-DD',
-             useCurrent: true
-        })
-    </script>
-@endsection
 
 <!-- Gazetted Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('gazetted', 'Gazetted:') !!}<small id="Error_gazetted"></small>
     <select name="gazetted" class="form-control gazetted " id="gazetted" onchange="isGazetted()">
         <option value="{{$corpse->gazetted}}">{{$corpse->gazetted}}</option>
-            <option value="">Select an Option</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
+        @if ($corpse->gazetted=="Yes")
+        <option value="No">No</option>
+        @else
+        <option value="Yes">Yes</option>
+        @endif 
     </select>
 </div>
 
@@ -983,36 +1017,64 @@
         })
     </script>
 @endsection
+<!-- Gazetted Date Field -->
+<div class="form-group col-sm-3">
+    {!! Form::label('volume_no', 'Volume #:') !!}<small id="Error_volume_no"></small>
+    {!! Form::text('volume_no', $corpse->volume_no, [ 'placeholder'=>"132:19",'class' => 'form-control volume_no','id'=>'volume_no']) !!}
+</div>
+
+ 
 
 
+<div class="form-group col-sm-3">
+    {!! Form::label('dna', 'DNA:') !!} <small id="Error_dna"></small>
+    <select name="dna" class="form-control dna" id="dna" onchange="is_dna()">
+        <option value="{{$corpse->getDna->dna}}">{{$corpse->getDna->dna}}</option>
+        @if ($corpse->getDna->dna=="Yes")
+        <option value="No">No</option>
+        @else
+        <option value="Yes">Yes</option>
+        @endif 
+        </select>
+</div>
+ 
+<div class="form-group col-sm-3">
+    {!! Form::label('dna_date', 'DNA Request Date:') !!}<small id="Error_dna_date"></small>
+    {!! Form::date('dna_date', $corpse->getDna->dna_request_date, ['class' => 'form-control dna_date','id'=>'dna_date']) !!}
+</div>
 
-        {{-- <!-- Pauper Burial Requested Field -->
-        <div class="form-group col-sm-3">
-            {!! Form::label('pauper_burial_requested', 'Pauper Burial Requested:') !!}<small id="Error_pauper_burial_requested"></small>
-            <select name="pauper_burial_requested" class="form-control pauper_burial_requested" id="pauper_burial_requested" onchange="pauperBurialRequested()">
-                <option value="{{$corpse->pauper_burial_requested}}">{{$corpse->pauper_burial_requested}}</option>
-                <option value="">Select an Option</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-            </select>
+@section('scripts')
+    <script type="text/javascript">
+        $('#dna_date').datetimepicker({
+            format: 'YYYY-MM-DD',
+             useCurrent: true
+        })
+    </script>
+@endsection
 
-        </div>
 
-        <!-- Pauper Burial Requested Date Field -->
-        <div class="form-group col-sm-3">
-            {!! Form::label('pauper_burial_requested_date', 'Pauper Burial Requested Date:') !!}<small id="Error_pauper_burial_requested_date"></small>
-            {!! Form::date('pauper_burial_requested_date', $corpse->pauper_burial_requested_date, ['class' => 'form-control pauper_burial_requested_date','id'=>'pauper_burial_requested_date']) !!}
-        </div>
+ 
+<!-- dna_result_date Field -->
+<div class="form-group col-sm-3">
+    {!! Form::label('dna_result_date', 'DNA Result Date:') !!}<small id="Error_dna_result_date"></small>
+    {!! Form::date('dna_result_date', $corpse->getDna->dna_result_date, [ 'class' => 'form-control dna_result_date','id'=>'dna_result_date']) !!}
+</div>
 
-        @section('scripts')
-            <script type="text/javascript">
-                $('#pauper_burial_requested_date').datetimepicker({
-                    format: 'YYYY-MM-DD',
-                     useCurrent: true
-                })
-            </script>
-        @endsection --}}
+@section('scripts')
+    <script type="text/javascript">
+        $('#dna_result_date').datetimepicker({
+            format: 'YYYY-MM-DD',
+             useCurrent: true
+        })
+    </script>
+@endsection
 
+
+<div class="form-group col-sm-12">
+    {!! Form::label('dna_result', 'DNA Result:') !!}<small id="Error_dna_result"></small>
+    {!! Form::textarea('dna_result', $corpse->getDna->dna_result,  [ 'rows'=> 4, 'class' => 'form-control dna_result','id'=>'dna_result']) !!}
+  
+</div>
 
 
 
@@ -1022,18 +1084,20 @@
 
 
 <!-- Buried Field -->
-<div class="form-group col-sm-3">
+<div class="form-group col-sm-6">
     {!! Form::label('buried', 'Buried:') !!}<small id="Error_buried"></small>
     <select name="buried" class="form-control buried"  id="buried" onchange="isBuried()">
         <option value="{{$corpse->buried}}">{{$corpse->buried}}</option>
-            <option value="">Select an Option</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
+        @if ($corpse->buried=="Yes")
+        <option value="No">No</option>
+        @else
+        <option value="Yes">Yes</option>
+        @endif 
         </select>
 </div>
 
 <!-- Burial Date Field -->
-<div class="form-group col-sm-3">
+<div class="form-group col-sm-6">
     {!! Form::label('burial_date', 'Burial Date:') !!}<small id="Error_burial_date"></small>
     {!! Form::date('burial_date', $corpse->burial_date, ['class' => 'form-control burial_date','id'=>'burial_date']) !!}
 </div>
@@ -1243,35 +1307,7 @@
 <input type="hidden" name="" value="" id="updateThisInvest">
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 
@@ -1337,6 +1373,8 @@ $('.editForm').on('click', function() {
                             fingerPrintDate();
                             is_dna();
                             dnaDate();
+                            dnaResult();
+                            dnaResultDate();
                             isGazetted();
                             gazettedDate();
 
@@ -1411,7 +1449,7 @@ $('.editForm').on('click', function() {
 
                             $(".CoprseSection").slideUp();
                             $(".CoprseSection2").slideDown();
-
+                            $("#one").addClass("completed");
                         }
                     } else {
 
@@ -1428,6 +1466,7 @@ $('.editForm').on('click', function() {
 
                         $(".CoprseSection").slideUp();
                         $(".CoprseSection2").slideDown();
+                        $("#one").addClass("completed");
                         }
                     }
                 }
@@ -1442,12 +1481,13 @@ $('.editForm').on('click', function() {
             CorpseCondition();
             typeDeath() ;
             mannerDeath();
-            anotomMethod();
+            anotomMethod(); 
             pickup_location = pickupLocation("pickup_location");
 
-             if ( pickup_date== true && condition== true && type_death== true && manner_death== true && anatomy== true && pickup_location== true) {
+             if ( pickup_date== true  &&  condition== true && type_death== true && manner_death== true && anatomy== true && pickup_location== true) {
                          $(".CoprseSection2").slideUp();
                          $(".io").slideDown();
+                         $("#two").addClass("completed");
                  }
 
       });
@@ -1466,6 +1506,7 @@ $('.editForm').on('click', function() {
             e.preventDefault();
             $(".io").slideUp();
             $(".CoprseSection2").slideDown();
+            $("#two").removeClass("completed");
 
        });
 
@@ -1475,18 +1516,19 @@ $('.editForm').on('click', function() {
         e.preventDefault();
         $(".CoprseSection2").slideUp();
         $(".CoprseSection").slideDown();
+        $("#one").removeClass("completed");
 
       });
 
 
       $("#MorgueSection").click(function(e){/// MOVE TO MORGUE SECTION
          e.preventDefault();
-
-
-
-            $(".io").slideUp();
-            $(".MorgueSection").slideDown();
-
+         case_summary();
+            if (summary == true) {
+                    $(".io").slideUp();
+                    $(".MorgueSection").slideDown();
+                    $("#three").addClass("completed");
+                }      
 
 
       });
@@ -1497,6 +1539,7 @@ $('.editForm').on('click', function() {
          e.preventDefault();
          $(".MorgueSection").slideUp();
          $(".io").slideDown();
+         $("#three").removeClass("completed");
       });
 
 
@@ -1518,6 +1561,7 @@ $('.editForm').on('click', function() {
         //     "  "+buried  +"  "+burial_date);
             $(".MorgueSection").slideUp();
             $(".adminSection").slideDown();
+            $("#four").addClass("completed");
       }
 
       });
@@ -1528,6 +1572,7 @@ $('.editForm').on('click', function() {
          e.preventDefault();
          $(".MorgueSection").slideDown();
          $(".adminSection").slideUp();
+         $("#four").removeClass("completed");
       });
 
 
@@ -1542,10 +1587,12 @@ $('.editForm').on('click', function() {
             fingerPrint();
             fingerPrintDate();
             is_dna();
+            dnaResultDate();
+            dnaResult();
             dnaDate();
             isGazetted();
             gazettedDate();
-
+            volumeNo();
             pauperBurialRequestedDate();
 
             isBuried();
@@ -1553,10 +1600,11 @@ $('.editForm').on('click', function() {
             //  console.log( dna_date +
             //  '  '+finger_print +"  "+finger_print_date     +"  "+gazetted  +"  "+ gazetted_date  +"  "+pauper_burial_requested   +"  "+
             //  pauper_burial_requested_date  +"  "+  buried  +"  "+burial_date);
-            if ( finger_print_date == true && dna== true && dna_date==true && finger_print == true &&gazetted == true && gazetted_date == true &&   buried == true &&burial_date ) {
+            if ( finger_print_date == true && dna_result==true && dna_result_date==true && volume_no ==true && dna== true && dna_date==true && finger_print == true &&gazetted == true && gazetted_date == true &&   buried == true &&burial_date ==true) {
 
             $(".adminSection").slideUp();
             $(".confirm").slideDown();
+            $("#five").addClass("completed");
          }
 
       });
@@ -1569,6 +1617,7 @@ $('.editForm').on('click', function() {
          e.preventDefault();
          $(".adminSection").slideDown();
          $(".confirm").slideUp();
+         $("#five").removeClass("completed");
       });
 
 
@@ -1640,6 +1689,11 @@ processData:false,
                 $(".confirm").slideUp();
                 $(".adminSection").slideUp();
 
+                $("#one").removeClass("completed");
+                $("#two").removeClass("completed");
+                $("#three").removeClass("completed");
+                $("#four").removeClass("completed");
+                $("#five").removeClass("completed");
 
                // $('# ').DataTable().ajax.reload();
             }
@@ -1728,10 +1782,11 @@ processData:false,
             investLastName("investigator_last_name");
             contact_no=contactNum();
             regNum=regulationNum();
+            
             assign_date=isfirstDateGreaterThanSecondDate("pickup_date","assign_date");
             rank_id=requireDropDown("rank_id");
            // console.log  ( rank_id ,station_id,contact_no,assign_date,investigator_last_name,investigator_first_name,regNum);
-            if( station_id == true && contact_no == true &&  assign_date == true &&
+            if( station_id == true  && contact_no == true &&  assign_date == true &&
             investigator_last_name == true && investigator_first_name == true &&
             rank_id == true &&  regNum == true)
             {

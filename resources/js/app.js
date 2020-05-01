@@ -57,7 +57,7 @@ const app = new Vue({
       Echo.private(`App.User.${window.Laravel.userId}`)
         .notification((notification) => {
             // console.log(notification);
-            Command: toastr["info"]("Check your Notification Bar for detail", "Notification")
+            Command: toastr["info"]("Go Dashboard - flag for best Notification detail", "Notification")
 
             toastr.options = {
               "closeButton": true,

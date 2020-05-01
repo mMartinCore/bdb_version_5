@@ -34,14 +34,14 @@ class SendTweentyFiveDaysEmail
                     $data = array('name' => $user->firstName, 'email' => $user->email,
                     'body' => ' Re:'.$event->corpse['name'].' Corpse picked up on '.$event->corpse['pickupdate'].' at '.$event->corpse['location'].' in '.$event->corpse['station'].
                     ' Police Area, within '. $event->corpse['division'].' Division. '.'
-                    Be advised the above mentioned corpse has been in storage for thirty (30) days.
+                    Be advised that the above mentioned corpse has been in storage for Twenty Five (25) days.
                     It is imperative that the body be Post mortemed, Finger Printed, Gazetted or DNA be done as the case may be to facilitate burial forthwith. '.
                     ' Note use this id : '.$event->corpse['id'].' for reference.');
 
                     Mail::send('emails.mail', $data, function($message) use ($data) {
                         $message->to($data['email'])
                             ->subject($this->subject);
-                    $message->from('jcfdodsystem@gmail.com');
+                    $message->from('jcfdbdsystem@gmail.com');
                     }
                 );
 

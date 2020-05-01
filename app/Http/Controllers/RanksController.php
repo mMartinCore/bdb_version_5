@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
-use App\Officer;
+use App\Corpse;
 use App\Commendation ;
 use App\Catcommendation;
 use Validator;
@@ -13,6 +13,8 @@ use Session;
 use App\Rank;
 use Illuminate\Support\Facades\Redirect;
 use App\Division;
+use App\Investigator;
+use App\User;
 use Prettus\Repository\Criteria\RequestCriteria;
 
 class RanksController extends  Controller
@@ -21,7 +23,7 @@ class RanksController extends  Controller
     public function __construct() {
         $this->middleware(['auth', 'isAdmin']);
     }
-
+ 
 
     /**
      * Display a listing of the Division.
@@ -149,8 +151,32 @@ class RanksController extends  Controller
 
             return redirect(route('ranks.index'));
         }
+       ////////////////////
+       $chech_if_Id_InUse=null;
+       $chech_if_Id_InUse2=null;
+       $corpses =User::where('rank_id',$id)->get();
+       $corpses2 =Investigator::where('rank_id',$id)->get();
 
-       $rank->delete($id);
+       foreach ($corpses as $corpse) {
+          $chech_if_Id_InUse= $corpse;
+       }
+
+       if (!empty($chech_if_Id_InUse)) {
+            Session::flash('error','Entity integrity constraints Enforces, Cannot be deleted !');
+        return redirect(route('ranks.index'));
+    }  
+
+       foreach ($corpses2 as $corpse) {
+        $chech_if_Id_InUse2= $corpse;
+        }
+     
+  
+       if (!empty($chech_if_Id_InUse2)) {
+            Session::flash('error','Entity integrity constraints Enforces, Cannot be deleted !');
+            return redirect(route('ranks.index'));
+    }  
+       /////////////////////////
+      $rank->delete($id);
 
        Session::flash('success','rank deleted successfully.');
 

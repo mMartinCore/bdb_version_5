@@ -31,7 +31,7 @@ class SendWelcomeEmail
         Mail::send('emails.mail', $data, function($message) use ($data) {
             $message->to($data['email'])
                     ->subject('Successful Registration');
-            $message->from('jcfdodsystem@gmail.com');
+            $message->from('jcfdbdsystem@gmail.com');
         });
     }
 }

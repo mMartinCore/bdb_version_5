@@ -42,8 +42,7 @@ class CreateCorpsesTable extends Migration
             $table->string('type_death')->nullable();
             $table->unsignedInteger('manner_id')->index();
             $table->unsignedInteger('anatomy_id')->index();
-            $table->unsignedInteger('condition_id')->index();
-            $table->longText('occurance')->nullable();
+            $table->unsignedInteger('condition_id')->index(); 
             ////////////////////////////////////////////////
             $table->string('dr_name',50)->nullable();
             $table->string('dr_contact',20)->nullable();
@@ -56,6 +55,7 @@ class CreateCorpsesTable extends Migration
             $table->string('finger_print')->nullable();
             $table->date('finger_print_date')->nullable();
             $table->string('gazetted')->nullable();
+            $table->string('volume_no',30)->nullable();
             $table->date('gazetted_date')->nullable();
             $table->string('pauper_burial_requested')->nullable()->default("No");
             $table->date('pauper_burial_requested_date')->nullable();
@@ -70,7 +70,7 @@ class CreateCorpsesTable extends Migration
             $table->date('postmortem_date')->nullable();
             $table->unsignedInteger('funeralhome_id')->index(); //id
             $table->string('pathlogist', 100); //id
-            $table->mediumText('cause_of_Death',200)->nullable();
+            $table->mediumText('cause_of_Death')->nullable();
             $table->string('body_status',50)->nullable()->default("No Status"); // id
             $table->integer('user_id');
             $table->integer('modified_by')->nullable();

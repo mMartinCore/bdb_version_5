@@ -89,15 +89,13 @@
                         <div  name="frmCheckPassword" id="frmCheckPassword"  class="form-group">
                             {{ Form::label('password', 'Password') }}<br>
 
-                            <input type="password" name="password" id="password" class="demoInputBox  form-control" onKeyUp="checkPasswordStrength();" /><div id="password-strength-status"></div>
-
-                        </div>
-
-                        <div class="form-group">
+                            <input type="password" name="password" id="password"   autocomplete='off' class="demoInputBox  form-control" onKeyUp="checkPasswordStrength();" /><div id="password-strength-status"></div>
+                           
                             {{ Form::label('password', 'Confirm Password') }}<br>
                             {{ Form::password('password_confirmation', array('class' => 'form-control')) }}
 
                         </div>
+ 
             </div>
     </div>
 
@@ -148,13 +146,13 @@ function email(name,myClass)
             $("."+name).css("border","2px solid red");
             return nameValue  = false;
         }
-        /*else if(!emailValidate.test(namex)){
+        else if(!emailValidate.test(namex)){
             $(".isEmailValid").hide();
             $("#Error_"+myClass).html("<small style='color:red'>Only JCF email valid... </small>");
             $("#Error_"+myClass).show();
             $("."+name).css("border","2px solid red");
         return nameValue  = false;
-        }*/
+        }
         else{
             $(".isEmailValid").show();
             $("."+name).css("border","2px solid green");
