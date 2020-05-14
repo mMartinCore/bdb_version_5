@@ -13,10 +13,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
    overflow: auto; /* Enable scroll if needed */
    background-color: rgb(0,0,0); /* Fallback color */
    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-
-
-
-
 }
 
 /* Modal Content */
@@ -33,18 +29,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
    -webkit-animation-duration: 0.6s;
    animation-name: animatetop;
    animation-duration: 0.5s
-}
-
-
-
-
-
+} 
 /* Add Animation */
 @-webkit-keyframes animatetop {
    from {top:-300px; opacity:0}
    to {top:0; opacity:1}
 }
-
 @keyframes animatetop {
    from {top:-300px; opacity:0}
    to {top:0; opacity:1}

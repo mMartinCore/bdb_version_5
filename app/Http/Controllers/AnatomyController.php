@@ -14,7 +14,7 @@ use App\Rank;
 use Illuminate\Support\Facades\Redirect;
 use App\Anatomy;
 use Prettus\Repository\Criteria\RequestCriteria;
-
+use Illuminate\Support\Facades\Cache;
 class AnatomyController  extends  Controller
 {
 
@@ -27,6 +27,14 @@ class AnatomyController  extends  Controller
      * @param Request $request
      * @return Response
      */
+
+     
+    public function clearCaches(){  
+        Cache::forget('Caches_key_corpse_create_Anatomy'); 
+        Cache::forget('Caches_key_corpse_edit_Anatomy');  
+        Cache::forget('Caches_key_corpse_index_Anatomy');          
+    }   
+
     public function index(Request $request)
     {
 
@@ -63,7 +71,7 @@ class AnatomyController  extends  Controller
          $anatomy->user_id=$request->user_id = auth()->user()->id;
          $anatomy->modify_by = $request->modify_by = 0;
          $anatomy->save();
-
+         $this->clearCaches(); 
          Session::flash('success','Anatomy  added successfully.');
 
         return redirect(route('anatomies.index'));
@@ -123,7 +131,7 @@ class AnatomyController  extends  Controller
        $anatomy->anatomy= $request->anatomy;
        $anatomy->modify_by = $request->modify_by = auth()->user()->id;
        $anatomy->save();
-
+       $this->clearCaches(); 
        Session::flash('success','Anatomy  updated successfully.');
         return redirect(route('anatomies.index'));
     }
@@ -157,6 +165,7 @@ class AnatomyController  extends  Controller
         }  
         
        $anatomy->delete($id);
+       $this->clearCaches(); 
        Session::flash('success','Anatomy  deleted successfully.');
        return redirect(route('anatomies.index'));
     }

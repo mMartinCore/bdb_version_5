@@ -130,23 +130,7 @@
 
 {{--
     <a href="{{ route('corpses.create') !!}" class="btn btn-success">Add corpse</a> --}}
-
-
-
-
-@include('corpses.showModal')
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 </div>
 
@@ -240,29 +224,4 @@
 
 
     </script>
-
-{{-- <script>
-    $(document).ready(function(){
-
-     $(document).on('click', '.page-link', function(event){
-        event.preventDefault();
-        var page = $(this).attr('href').split('page=')[1];
-        fetch_data(page);
-     });
-
-     function fetch_data(page)
-     {
-      var _token = "{{ csrf_token() }}",
-      $.ajax({
-          url:"{{ route('pagination.fetch') }}",
-          method:"POST",
-          data:{_token:_token, page:page},
-          success:function(data)
-          {
-           $('#table_data').html(data);
-          }
-        });
-     }
-
-    });
-    </script> --}}
+ 

@@ -41,7 +41,7 @@ use App\Http\Controllers\mysql_real_escape_string;
 //use Illuminate\Notifications\Notification;
 use  Notification;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Cache;
 use function PHPSTORM_META\type;
 
 class CorpseController extends Controller
@@ -72,7 +72,17 @@ class CorpseController extends Controller
 
 
 
-
+    public function clearCaches(){
+        Cache::forget('Caches_key_parishes');
+        Cache::forget('cache_key_dashboard');
+        Cache::forget('cache_key_approve_list'); 
+        Cache::forget('cache_key_notApprove_list');              
+        Cache::forget('cache_key_dashboard_burial_request');
+        Cache::forget('cache_key_dashboard_burial_NotApproved');
+        Cache::forget('cache_key_dashboard_post_mortem_pending');
+        Cache::forget('cache_key_dashboard_divisionOverThirstyDays');
+        Cache::forget('cache_key_dashboard_stationOverThirstyDays');
+    }
 
 
 
@@ -80,103 +90,65 @@ class CorpseController extends Controller
     public function index()
     {
         // $corpses = Corpse::orderBy('created_at', 'desc')->get();
-        $funeralhomes = Funeralhome::get();
-        $auth_user_div_id= auth()->user()->station->division->id  ;
-        $parishes=Parish::get();
+        $funeralhomes =  cache()->remember('Caches_key_CorpseIndexFuneralHome',Session::get('caches_time'), function () {
+            return  Funeralhome::get();
+        });
+        $auth_user_div_id= auth()->user()->station->division->id;  
+        $parishes= cache()->remember('cache_key_parish_corpse_index',Session::get('caches_time'), function () {
+            return  Parish::get();
+        });
+
   
         if(!auth()->user()->hasRole('SuperAdmin')){
-            $stations = Station::where('division_id', $auth_user_div_id)->get();
-            $divisions = Division::where('id', $auth_user_div_id)->get();
+            
+            $stations = cache()->remember('Caches_key_CorpseIndexStations',Session::get('caches_time'), function () use( $auth_user_div_id) {
+                return  Station::where('division_id', $auth_user_div_id)->get();
+            });       
+ 
+            $divisions= cache()->remember('Caches_key_corpse_index_Division',Session::get('caches_time'), function () use( $auth_user_div_id){
+                return  Division::where('id', $auth_user_div_id)->get();
+            });
+
             $total_records=Corpse::where('division_id', $auth_user_div_id)->count();
             $corpses=Corpse::where('division_id', $auth_user_div_id)->latest('updated_at')->paginate(10);
          }else{
-            $divisions = Division::get();
+            $divisions= cache()->remember('Caches_key_corpse_index_Division',Session::get('caches_time'), function () {
+                return   Division::get();
+            });
             $total_records=Corpse::count();
             $corpses=Corpse::latest('updated_at')->paginate(10);
-            $stations = Station::get();
-         }    
-         $conditions= Condition::get();
-         $manners= Manner::get();
-         $anatomies= Anatomy::get();
-         $ranks =  Rank::all();
+            $stations = cache()->remember('Caches_key_CorpseIndexStations',Session::get('caches_time'), function ()  {
+                return  Station::get();
+            });
+         }   
+         
+
+         $conditions= cache()->remember('Caches_key_corpse_index_Condition',Session::get('caches_time'), function () {
+            return Condition::get();   
+        });  
+
+     
+         
+        $manners= cache()->remember('Caches_key_CorpseIndexManners',Session::get('caches_time'), function () {
+            return Manner::get();  
+        });
+
+         $anatomies= cache()->remember('Caches_key_corpse_index_Anatomy',Session::get('caches_time'), function () {
+            return Anatomy::get();   
+        });   
+
+         $ranks = cache()->remember('cache_key_RanksCorpseIndex',Session::get('caches_time'), function () {
+            return Rank::get(); // Rank::paginate(10); 
+        });
+
          return view('corpses.index', compact('funeralhomes','corpses', 'parishes','stations','conditions','manners','anatomies','total_records','divisions'));
     }
 
 
     public function export()
     {
-        $da = array();
-      //  $newExportList=array();
+        $da = array(); 
         $da =Session::get('getExportList');
-
-
-        // foreach ($da as  $corpse) {
-        //     $storagedays = $this->storageday($corpse->pickup_date, $corpse->burial_date);
-        //     if ($storagedays >= 30) {
-
-        //         $storagedays =  $storagedays;
-
-        //         if ($storagedays > 30) {
-
-        //             $excess = $storagedays - 30;
-
-
-        //             if ($excess > 0) {
-        //             } else {
-        //                 $excess = 0;
-        //             }
-        //         } else {
-        //             $excess = 0;
-        //         }
-
-        //     } elseif ( $storagedays <= 30) {
-        //         $excess = 0;
-        //         $storagedays = $storagedays;
-        //     }
-
-
-        //     if ($corpse->first_name == "Unidentified") {
-
-        //         if ($corpse->suspected_name != '')
-        //             $name = '*' . $corpse->suspected_name . '*';
-        //         else {
-        //             $name = 'Unidentified';
-        //         }
-        //     } else {
-        //         $name = $corpse->first_name . ' ' . $corpse->middle_name . ' ' . $corpse->last_name;
-        //     }
-
-        //     $newExportList[]= [$corpse->id , $name, $corpse->death_date, $corpse->pickup_date , $corpse->anatomy,
-        //                     $corpse->postmortem_status, $corpse->division, $corpse->pauper_burial_requested ,
-        //                     $corpse->pauper_burial_approved,  $corpse->burffied,  $storagedays,  $excess
-        //                       ];
-
-
-
-
-
-
-        //         //  $newExportList[]= array(
-        //         //                 'Id'=>$corpse->id ,
-        //         //                 'Name'=> $name,
-        //         //                 'Date of Death'=>$corpse->death_date,
-        //         //                 'Pickup Date'=> $corpse->pickup_date ,
-        //         //                 'Anatomy'=> $corpse->anatomy,
-        //         //                 'Postmortem Status'=> $corpse->postmortem_status,
-        //         //                 'Division'=> $corpse->division,
-        //         //                 'Pauper burial request '=>$corpse->pauper_burial_requested ,
-        //         //                 'Pauper burial request Approved'=>  $corpse->pauper_burial_approved,
-        //         //                 'Buried'=> $corpse->buried,
-        //         //                 'Storagedays' =>  $storagedays,
-        //         //                 'Excess'=> $excess
-        //         //                );
-        //    }
-        //   $newExportList=(object)  $newExportList ;
-
-
-        //  // dd($newExportList, $da);
-
-
         return Excel::download(new CorpseExport( collect($da)), 'Corpses.xlsx');
     }
 
@@ -384,12 +356,15 @@ return response($data);
     public function approve()
     {
         if(!auth()->user()->hasRole('SuperAdmin')){
-        $corpses = Corpse::where('pauper_burial_approved', 'Processing')->where('division_id', auth()->user()->station->division->id  )
-            ->paginate(10);
+
+            $corpses = cache()->remember('cache_key_approve_list',Session::get('caches_time'), function ()  {
+                return  Corpse::where('pauper_burial_approved', 'Processing')->where('division_id', auth()->user()->station->division->id  )->get();//paginate(10);
+                });  
         }else {
-            $corpses = Corpse::where('pauper_burial_approved', 'Processing')
-            ->paginate(10);
-        }
+           $corpses = cache()->remember('cache_key_approve_list',Session::get('caches_time'), function ()  {
+                return      Corpse::where('pauper_burial_approved', 'Processing')->get();//paginate(10);
+                }); 
+            }
         $listType="Request";
         return view('corpses.approve')->withCorpses($corpses)->withListType($listType);
     }
@@ -399,11 +374,16 @@ return response($data);
     public function notApprove()
     {
         if(!auth()->user()->hasRole('SuperAdmin')){
-        $corpses = Corpse::where('pauper_burial_approved', 'No')->where('division_id', auth()->user()->station->division->id  )
-            ->paginate(10);
+            $corpses = cache()->remember('cache_key_notApprove_list',Session::get('caches_time'), function ()  {
+                return     Corpse::where('pauper_burial_approved', 'No')->where('division_id', auth()->user()->station->division->id  )->get();//paginate(10);
+                }); 
         }else{
-            $corpses = Corpse::where('pauper_burial_approved', 'No')
-            ->paginate(10);
+            
+            
+            $corpses = cache()->remember('cache_key_notApprove_list',Session::get('caches_time'), function ()  {
+                return     Corpse::where('pauper_burial_approved', 'No')->get();//paginate(10);
+                }); 
+                 
         }
         $listType="Request Denied";
         return view('corpses.approve')->withCorpses($corpses)->withListType($listType);
@@ -412,7 +392,7 @@ return response($data);
 
     public function noRequest()
     {     if(!auth()->user()->hasRole('SuperAdmin')){
-        $corpses = Corpse::where('pauper_burial_approved', 'No-Request')->where('division_id', auth()->user()->station->division->id  )->paginate(5);
+        $corpses = Corpse::where('pauper_burial_approved', 'No-Request')->where('division_id', auth()->user()->station->division->id  )->paginate(10);
     }else {
         $corpses = Corpse::where('pauper_burial_approved', 'No-Request')->paginate(10);
     }
@@ -571,6 +551,7 @@ return response($data);
                     $corpse->pauper_burial_approved_date = date("Y-m-d H:i:s");
                     $corpse->modified_by  = auth()->user()->id;
                     $corpse->update();
+                    $this->clearCaches(); 
                     $success_output = '<div class="alert alert-success"> Request Denied Sucessfully! </div>';
                 } catch (\Throwable $th) {
                     $error_array = ['Error, Something occurred while updating denial request!'];
@@ -727,6 +708,7 @@ catch (\Throwable $th) {
                     try {
                      $corpse->modified_by  = auth()->user()->id;
                     $corpse->update();
+                    $this->clearCaches(); 
                     $success_output = '<div class="alert alert-success"> Re-open to view changes  </div>';
 
                     } catch (\Throwable $th) {
@@ -870,898 +852,10 @@ catch (\Throwable $th) {
         return $data;
     }
 
+ 
 
-    public function search($arg)
-    {
-        // $corpses =  DB::select(DB::raw("SELECT * FROM corpses WHERE $arg like '%$arg%' and "));
-    }
 
 
-    public function getCorpse(Request $request)
-    {
-
-       $auth_user_div_id= auth()->user()->station->division->id  ;
-       $auth_user_divSingle ="where `users`.division_id = $auth_user_div_id ";
-
-       $auth_user_divMult =" and `users`.division_id = $auth_user_div_id";
-        $data = $request->except('_token');
-        $except ='';
-        $query = '';
-        $count = 0;
-        $search= false;
-        $page = 0;
-        $pagination_link = '';
-        $total_records =0;
-        $record_per_page=1;
-        $total_recordsFromSearch=0;
-        $total_recordsFromSearchCnt=0;
-        $total_records= DB::table('corpses')->count();
-        $order_by_last_name = 'asc';
-
-        foreach ($data as $key => $value) {
-            $value =$this->test_input( $value);
-
-            if($key=='order_by_last_name') {
-
-                if($value!='') {
-                      $order_by_last_name =$value;
-                }else   {
-                $order_by_last_name = 'asc';
-                }
-
-             }
-
-
-
-            if($key=='page' ||$key=='order_by_last_name')
-            {  }
-            else
-            {       $search=true;
-                    if ($value != '' && $count > 0 && $key != 'regNum') {
-                        $this->countVal = 1;
-                        $this->antherVariable = 2;
-                        if ($key == 'pauper_burial_approved' || $key == 'buried' || $key == 'division_id' ||  $key == 'anatomy_id' ||  $key == 'parish' || $key == 'funeralhome_id' ||  $key == 'station_id' ||   $key == 'sex'  ) {
-                            $query .= " and corpses.$key ='$value'";
-                        } else {
-
-                            $query .= " and  corpses.$key like  '%$value%'";
-                        }
-                    } else  if ($value != '' && $count == 0 && $key != 'regNum') {
-                        $count = $count + 1;
-                        $this->countVal = 1;
-                        $this->antherVariable = 1;
-                        if ( $key == 'pauper_burial_approved' || $key == 'buried' || $key == 'division_id' ||  $key == 'anatomy_id' ||  $key == 'parish' || $key == 'funeralhome_id' ||  $key == 'station_id' ||  $key == 'sex' ) {
-                            $query .= " where corpses.$key = '$value'";
-                        } else {
-
-                            $query .= " where corpses.$key like '%$value%' ";
-                        }
-                    }
-
-                    //  I TEST FOR REG NUM HERE
-                    if ($key == 'regNum' && $value != '') {
-                        //$this->regNunWithOther = " and $key ='$value' ";
-                        $this->regNo = " $key ='$value'";
-                    }
-           }
-
-                if($key=='page')
-                {
-                        $intVal=(int) $value;
-
-                            if($intVal >1) {
-                            $page =$intVal;
-                            } else {
-
-                                $page = 1;
-                            }
-                }else {
-
-                     $page = 1;
-                }
-
-
-
-
-
-
-        }
-
-
-
-
-
-
-        $start_from = ($page - 1) *    $record_per_page;
-        if (  $start_from <0) {
-            $start_from=0;
-        }
-
-
-      // try {
-
-               if(!auth()->user()->hasRole('SuperAdmin')){
-                    if ($this->regNo != '') {
-                        if ($this->countVal == 0) {
-                            //HERE IS JUST run REGNUM ONLY
-                            $corpses =  DB::select(DB::raw("SELECT DISTINCT  divisions.division, corpses.* FROM corpses INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                            INNER join `investigators` on `investigators`.corpse_id = `corpses`.id
-                            INNER join `users` on `divisions`.id = `users`.division_id  where `users`.division_id= $auth_user_div_id
-                            AND $this->regNo  ORDER BY created_at  LIMIT $start_from, $record_per_page "));
-//0
-
-                            $total_recordsFromSearch  =  DB::select(DB::raw("SELECT DISTINCT  COUNT(`corpses`.id) AS cntTotalResult_search FROM corpses
-                            INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                            INNER join `users` on `divisions`.id = `users`.division_id
-                            INNER join `investigators` on `investigators`.corpse_id = `corpses`.id where $this->regNo AND  `users`.division_id= $auth_user_div_id GROUP BY  `corpses`.id"));
-
-
-                        } else if ($this->antherVariable == 1) {
-                            $corpses =
-                                DB::select(DB::raw("SELECT DISTINCT  divisions.division ,corpses.* FROM corpses
-                                INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                                INNER join `investigators` on `investigators`.corpse_id = `corpses`.id
-                                INNER join `users` on `divisions`.id = `users`.division_id  $query
-                                AND  $this->regNo   $auth_user_divMult  ORDER BY created_at  LIMIT $start_from, $record_per_page "));
-
-//1
-                                $total_recordsFromSearch  = DB::select(DB::raw("SELECT DISTINCT COUNT(`corpses`.id) AS cntTotalResult_search  FROM corpses
-                                INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                                INNER join `users` on `divisions`.id = `users`.division_id
-                                INNER join `investigators` on `investigators`.corpse_id = `corpses`.id   $query AND  `users`.division_id= $auth_user_div_id  AND   $this->regNo  "));
-
-
-                        } elseif ($this->antherVariable == 2) {
-
- //2
-                            $corpses =
-                                DB::select(DB::raw("SELECT DISTINCT  divisions.division ,corpses.* FROM corpses
-                                INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                                INNER join `investigators` on `investigators`.corpse_id = `corpses`.id
-                                INNER join `users` on `divisions`.id = `users`.division_id
-                                $query and $this->regNo   $auth_user_divMult  ORDER BY created_at  LIMIT $start_from, $record_per_page"));
-
-                                $total_recordsFromSearch  = DB::select(DB::raw("SELECT DISTINCT COUNT(`corpses`.id) AS cntTotalResult_search FROM corpses
-                                INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                                INNER join `users` on `divisions`.id = `users`.division_id
-                                INNER join `investigators` on `investigators`.corpse_id = `corpses`.id $query AND  `users`.division_id= $auth_user_div_id and $this->regNo"));
-
-
-                        }
-                    } else {
-  //3
-                      $corpses =  DB::select(DB::raw("SELECT DISTINCT divisions.division ,corpses.* FROM corpses
-                                                           INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                                                           INNER join `users` on `divisions`.id = `users`.division_id   $query
-                                                           AND  `users`.division_id= $auth_user_div_id  ORDER BY created_at  LIMIT $start_from, $record_per_page"));
-
-                            $total_recordsFromSearch =  DB::select(DB::raw("SELECT DISTINCT COUNT(`corpses`.id) AS cntTotalResult_search FROM corpses
-                            INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                            INNER join `users` on `divisions`.id = `users`.division_id  $query
-                            AND  `users`.division_id= $auth_user_div_id "));
-
-
-
-                  }
-
-
-        } else {
-
-            if ($this->regNo != '') {
-                if ($this->countVal == 0) {
-                    //HERE IS JUST run REGNUM ONLY
-                    $corpses =  DB::select(DB::raw("SELECT DISTINCT divisions.division, corpses.* FROM corpses
-                     INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                     INNER join `investigators` on `investigators`.corpse_id = `corpses`.id where $this->regNo  ORDER BY created_at LIMIT $start_from, $record_per_page"));
-
-
-                    $total_recordsFromSearch  =  DB::select(DB::raw("SELECT DISTINCT  COUNT(`corpses`.id) AS cntTotalResult_search FROM corpses
-                    INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                    INNER join `investigators` on `investigators`.corpse_id = `corpses`.id where $this->regNo GROUP BY  `corpses`.id"));
-
-
-
-
-                } else if ($this->antherVariable == 1) {
-
-                    $corpses =
-                        DB::select(DB::raw("SELECT DISTINCT divisions.division ,corpses.* FROM corpses
-                        INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                        INNER join `investigators` on `investigators`.corpse_id = `corpses`.id   $query AND  $this->regNo  ORDER BY created_at  LIMIT $start_from, $record_per_page "));
-
-                        $total_recordsFromSearch  = DB::select(DB::raw("SELECT DISTINCT COUNT(`corpses`.id) AS cntTotalResult_search  FROM corpses
-                        INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                        INNER join `investigators` on `investigators`.corpse_id = `corpses`.id   $query AND  $this->regNo  "));
-
-
-
-
-                } elseif ($this->antherVariable == 2) {
-
-                    $corpses =
-                        DB::select(DB::raw("SELECT DISTINCT divisions.division ,corpses.* FROM corpses
-                        INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                        INNER join `investigators` on `investigators`.corpse_id = `corpses`.id $query and $this->regNo  ORDER BY created_at   LIMIT $start_from, $record_per_page "));
-
-                        $total_recordsFromSearch  = DB::select(DB::raw("SELECT DISTINCT COUNT(`corpses`.id) AS cntTotalResult_search FROM corpses
-                        INNER join `divisions` on `divisions`.id = `corpses`.division_id
-                        INNER join `investigators` on `investigators`.corpse_id = `corpses`.id $query and $this->regNo"));
-
-
-
-                }
-            } else {
-
-               $corpses =  DB::select(DB::raw("SELECT DISTINCT divisions.division ,corpses.* FROM corpses INNER join `divisions` on `divisions`.id = `corpses`.division_id $query
-                   ORDER BY  last_name $order_by_last_name  LIMIT $start_from, $record_per_page"));
-               $total_recordsFromSearch =  DB::select(DB::raw("SELECT DISTINCT COUNT(`corpses`.id) AS cntTotalResult_search FROM corpses INNER join `divisions` on `divisions`.id = `corpses`.division_id $query"));
-
-
-            }
-
-
-        }
-
-
-
-
-
-
-
-
-
-        // } catch (\Throwable $th) {
-        //     return $except = 'Something occurred while retriving record !';
-        // }
-
-        /*
-        DB::table('corpses')
-        ->select(DB::raw('count(*) as user_count, id,*'))->
-        $query->groupBy('id')->paginate(3);*/
-
-        //DB::table('corpses')->$query->get()->paginate(1);
-        // Corpse::where('id','!=',null).$query->paginate(1);
-        // DB::select( DB::raw("SELECT * FROM corpses $query ") );
-        // -- unidentified = '$request->unidentified'
-        // --     and (first_name = '' OR first_name like '%$request->first_name%')
-        // --     and (middle_name ='' OR middle_name like '%$request->middle_name%')
-        // --     and (last_name= '' OR last_name like '%$request->last_name%')
-        // --     and (sex ='$request->sex' OR sex ='')
-        // --  OR pauper_burial_requested_date ='$request->pauper_burial_requested_date'
-        // --  OR pickup_date = '$request->pickup_date'
-        // --   OR pickup_location = '$request->pickup_location'
-        // --    OR regNum ='$request->regNum'
-        // --    OR funeralhome_id ='$request->funeralhome_id'
-        // --    OR anatomy ='$request->anatomy'
-        // --      unidentified = '$request->unidentified'
-        // --    OR first_name = '$request->first_name
-        // --    OR middle_name ='$request->middle_name'
-        // --    OR last_name='$request->last_name'
-        // --    OR pauper_burial_requested_date= '$request->pauper_burial_requested_date'
-        // --    OR pickup_date = '$request->pickup_date'
-        // --    OR pickup_location = '$request->pickup_location'
-        // --    OR regNum ='$request->regNum'
-        // --    OR funeralhome_id ='$request->funeralhome_id'
-        // --    OR anatomy ='$request->anatomy'
-        // --    OR death_date = '$request->death_date'
-
-
-
-
-        // $corpses = DB::table('corpses')->where('unidentified',$request->unidentified)
-        // ->where('first_name','like','%'.$request->first_name.'%')
-        // ->orWhere('first_name','like','%'.$request->first_name.'%')
-
-        // ->where('middle_name','like','%'.$request->middle_name.'%')
-        // ->orWhere('middle_name','like','%'.$request->middle_name.'%')
-
-        // ->where('last_name','like','%'.$request->last_name.'%')
-        // ->orWhere('last_name','like','%'.$request->last_name.'%')
-
-
-
-
-
-
-
-        // ->orWhere('pauper_burial_requested_date','like', $request->pauper_burial_requested_date)
-
-        // ->orWhere('death_date','like', $request->death_date)
-
-        // ->orWhere('pickup_date','like',$request->pickup_date)
-
-        // ->orWhere('pickup_location','like','%'.$request->pickup_location.'%')
-
-        // ->orWhere('anatomy','like','%'. $request->anatomy.'%')
-
-        // ->orWhere('regNum','like','%'.$request->regNum.'%')
-
-        // ->orWhere('funeralhome_id','like','%'. $request->funeralhome_id.'%')
-
-        // ->orWhere('unidentified','like','%'.$request->unidentified.'%')
-
-        // ->where('sex', $request->sex)
-        // ->orWhere('sex', $request->sex)
-
-
-        // ->get();
-
-        //     $corpses = Corpse::orderBy('created_at', 'desc')->get();
-
-        $table = '';
-        $count = 0;
-        $storagedays = '';
-        $excess = 0;
-        // dd($corpses);
-        $name = '';
-
-
-
-
-foreach ($total_recordsFromSearch as $key => $cnt) {
-    $total_recordsFromSearchCnt= (int)  $cnt->cntTotalResult_search;
-}
-
-
-
-
-        foreach ($corpses as $key => $corpse) {
-
-            $storagedays = $this->storageday($corpse->pickup_date, $corpse->burial_date);
-            if ($storagedays >= 30 && $corpse->burial_date == '') {
-
-                if ($storagedays > 30) {
-
-                    $excess = $storagedays - 30;
-
-
-                    if ($excess > 0) {
-                    } else {
-                        $excess = 0;
-                    }
-                } else {
-                    $excess = 0;
-                }
-
-                // $overThirty=
-            } elseif ( $storagedays <= 30 && $corpse->burial_date =='') {
-                $excess = 0;
-                $storagedays = $storagedays;
-            }else{
-                $excess = 0;
-            }
-
-
-            if ($corpse->first_name == "Unidentified") {
-
-                if ($corpse->suspected_name != '')
-                    $name = '*' . ucfirst($corpse->suspected_name) . '*';
-                else {
-                    $name = 'Unidentified';
-                }
-            } else {
-                $name = ucfirst($corpse->first_name ). ' ' .ucfirst($corpse->middle_name ). ' ' . ucfirst($corpse->last_name);
-            }
-
-             $anatomy= Anatomy::findOrFail($corpse->anatomy_id);
-            if(auth()->user()->hasRole('SuperAdmin')){
-                // $del='SuperAdmin|Admin|viewer|write';
-                $table .= '<tr>
-                <td>' .'<a class="btn showViewModal btn-success btn-xs"   onclick="getViewId(' . $corpse->id . ')" > '.$corpse->id .' </a>'. '</td>'
-                .'<td>' . $name . '</td>
-                .<td>' . $corpse->death_date . '</td>
-                .<td>' . $corpse->pickup_date . '</td>
-                .<td>' .$anatomy->anatomy  . '</td>
-                .<td>' . $corpse->postmortem_status . '</td>
-                .<td>' . $corpse->division . '</td>
-                .<td>' . $corpse->pauper_burial_requested . '</td>
-                .<td>' . $corpse->pauper_burial_approved . '</td>
-                .<td>' . $corpse->buried . '</td>
-                .<td>' . $storagedays . '</td>
-                .<td>' . $excess . '</td>
-                .<td width="6%">
-                <div class="btn-group no">
-              <a href="corpses/' . $corpse->id . '/edit" class="btn btn-primary btn-xs "><i class="glyphicon glyphicon-edit"></i></a>' .
-             '<a  href="#"  class="btn btn-danger  btn-xs " onclick="getId(' . $corpse->id . ')" >    <i class="glyphicon glyphicon-trash"></i></a>
-                </div>'
-
-            . '</td>
-            </tr>';
-        $count++;
-    }else  if(auth()->user()->hasRole('Admin')){
-        $table .= '<tr>
-        <td>' .'<a  class="btn showViewModal btn-success btn-xs"  onclick="getViewId(' . $corpse->id . ')" > '.$corpse->id .' </a>'. '</td>'
-        .'<td>' . $name . '</td>
-        .<td>' . $corpse->death_date . '</td>
-        .<td>' . $corpse->pickup_date . '</td>
-        .<td>' . $anatomy->anatomy . '</td>
-        .<td>' . $corpse->postmortem_status . '</td>
-        .<td>' . $corpse->division . '</td>
-        .<td>' . $corpse->pauper_burial_requested . '</td>
-        .<td>' . $corpse->pauper_burial_approved . '</td>
-        .<td>' . $corpse->buried . '</td>
-        .<td>' . $storagedays . '</td>
-        .<td>' . $excess . '</td>
-        .<td>
-        <div class="btn-group">'
-        .'<a href="corpses/' . $corpse->id . '/edit" class="btn btn-primary btn-xs "><i class="glyphicon glyphicon-edit"></i></a>' .
-    ' </div>'
-
-    . '</td>
-    </tr>';
-    $count++;
-    }
-
-    else  if(auth()->user()->hasRole('writer')){
-        $table .= '<tr>
-        <td>' .'<a class="btn showViewModal btn-success btn-xs"   onclick="getViewId(' . $corpse->id . ')" > '.$corpse->id .' </a>'. '</td>'
-        .'<td>' . $name . '</td>
-        .<td>' . $corpse->death_date . '</td>
-        .<td>' . $corpse->pickup_date . '</td>
-        .<td>' . $anatomy->anatomy  . '</td>
-        .<td>' . $corpse->postmortem_status . '</td>
-        .<td>' . $corpse->division . '</td>
-        .<td>' . $corpse->pauper_burial_requested . '</td>
-        .<td>' . $corpse->pauper_burial_approved . '</td>
-        .<td>' . $corpse->buried . '</td>
-        .<td>' . $storagedays . '</td>
-        .<td>' . $excess . '</td>
-        .<td>
-        <div class="btn-group">
-        <a href="corpses/' . $corpse->id . '/edit" class="btn btn-primary btn-xs "><i class="glyphicon glyphicon-edit"></i></a>' .
-    ' </div>'
-
-    . '</td>
-    </tr>';
-$count++;
-    }
-
-    else  if(auth()->user()->hasRole('view')){
-        $table .= '<tr>
-        <td>' .'<a class="btn showViewModal btn-success btn-xs"   onclick="getViewId(' . $corpse->id . ')" > '.$corpse->id .' </a>'. '</td>'
-        .'<td>' . $name . '</td>
-        .<td>' . $corpse->death_date . '</td>
-        .<td>' . $corpse->pickup_date . '</td>
-        .<td>' .$anatomy->anatomy . '</td>
-        .<td>' . $corpse->postmortem_status . '</td>
-        .<td>' . $corpse->division . '</td>
-        .<td>' . $corpse->pauper_burial_requested . '</td>
-        .<td>' . $corpse->pauper_burial_approved . '</td>
-        .<td>' . $corpse->buried . '</td>
-        .<td>' . $storagedays . '</td>
-        .<td>' . $excess . '</td>
-        .<td>
-        <div class="btn-group">
-        </div>'
-    . '</td>
-    </tr>';
-$count++;
-    }
-
-
-
-}
-
-
-
-$pagination_link='';
-//dd($page);
-if(  $search==true || $page > 1 ){
-
-    $total_pages = ceil($total_recordsFromSearchCnt /$record_per_page);
-
-}else{
-
-    $total_pages = ceil($total_recordsFromSearchCnt /$record_per_page);
-}
-
-
-
-
-if($page > 1){
-    $pagination_link .= "<span class='pagination_link hover btn-xs btn btn-info' style='cursor:pointer; height:25px; width:35px; padding:5px; border:1px solid #ccc;' id='".(1)."'>
-     First </span>";
-}
-
-
-if($page > 1){
-    $pagination_link .= "<span class='pagination_link hover btn-xs btn btn-info' style='cursor:pointer; height:25px; width:35px; padding:5px; border:1px solid #ccc;' id='".($page-1)."'>
-     Prev </span>";
-}
-
-for($i=1; $i<=$total_pages; $i++)
-{
-     if($page==$i)
-     {
-        $pagination_link .= "<a class=' active ></a>";
-   }
-
-     $pagination_link .= "<a class='pagination_link hover btn-xs btn btn-primary ' style='cursor:pointer; height:25px; width:35px; padding:5px; border:1px solid #ccc;' id='".$i."'> ".$i."</a>";
-}
-
-if( $i-1 >$page ){
-    $pagination_link .= "<span class='pagination_link hover btn-xs btn btn-info' style='cursor:pointer; height:25px; width:35px;padding:5px; border:1px solid #ccc;' id='".($page + 1)."'>
-     Next </span>";
-}
-
-if( $i-1 >$page ){
-    $pagination_link .= "<span class='pagination_link hover btn-xs btn btn-info' style='cursor:pointer; height:25px; width:35px;padding:5px; border:1px solid #ccc;' id='".($i-1) ."'>
-     Last </span>";
-}
-
-
-
-
-
-
-if($count<$record_per_page){
-   $pageRemain= $record_per_page -$count;
-    $countTotal =  $page *$record_per_page ;
-    $count = $countTotal -  $pageRemain;
-}else{
-    $count =$count * $page;
-}
-
-
-
-
-
-Session::put('getExportList',$corpses);
-$this->setExportList($corpses);
-$this->getExportList();
-        $data = array(
-            'table' => $table,
-            'cnt' => $count ,
-            'search_Count_total'=>$total_recordsFromSearchCnt ,
-            'pagination_link'=> $pagination_link,
-            'error'=>$except ,
-        );
-
-       return response($data);
-    }
-
-
-
-
-
-
-
-    public function overThirtyDaysStats()
-    {
-        $pieChartData = $this->myChart();
-        $total_Count_per_NotApproved = array();
-        $total_per_division = array();
-        $total_per_Div_NotBuried = array();
-        $total_Count_per_Pending = array();
-        $division_Name = array();
-        $notBuriedDivNames = array();
-        $burial_NotApprovedName = array();
-        $pendingPostmortemName= array();
-
-        foreach ($pieChartData['divisionName'] as  $Name) {
-            if ($Name != '') {
-                $division_Name[] = $Name;
-            }
-        }
-
-
-        foreach ($pieChartData['total_Count_per_division'] as $key => $count) {
-
-            $total_per_division[] = $count;
-        }
-
-
-
-        foreach ($pieChartData['notBuriedDivNames'] as  $divName) {
-            if ($divName != '') {
-                $notBuriedDivNames[] = $divName;
-            }
-        }
-
-        foreach ($pieChartData['total_Count_per_NotBuried'] as  $cnt) {
-            //  dd( $cnt);
-            $total_per_Div_NotBuried[] = $cnt;
-        }
-
-
-
-        foreach ($pieChartData['pendingPostmortemName'] as  $pendingName) {
-            if ($pendingName != '') {
-                $pendingPostmortemName[] = $pendingName;
-            }
-        }
-        foreach ($pieChartData['total_Count_per_Pending'] as  $cnxt) {
-            $total_Count_per_Pending[] = $cnxt;
-        }
-
-
-
-
-
-        foreach ($pieChartData['burial_NotApprovedName'] as  $notApprovedName) {
-            if ($notApprovedName != '') {
-                $burial_NotApprovedName[] = $notApprovedName;
-            }
-        }
-
-        foreach ($pieChartData['total_Count_per_NotApproved'] as  $cn) {
-            $total_Count_per_NotApproved[] = $cn;
-        }
-
-
-        //    $divValue =$pieChartData['total_Count_per_division'];
-
-        $chart = Charts::create('donut', 'highcharts')
-            ->title('Bodies Over 30 Days per Division')
-            ->labels($division_Name)
-            ->values($total_per_division)
-            ->dimensions(1000, 500)
-            ->responsive(true);
-
-
-        $bar = Charts::create('bar', 'highcharts')
-            ->title('Not Buried per Division')
-            ->elementLabel(' Total Bodies Not Buried')
-            ->labels($notBuriedDivNames)
-            ->values($total_per_Div_NotBuried)
-            ->dimensions(1000, 500)
-            ->backgroundcolor("#ECF0F5")
-            ->responsive(true);
-
-
-
-
-
-        $pie = Charts::create('pie', 'google')
-            ->title('Post Mortem Pending per Division')
-            ->elementLabel(' Total Pending  Post Mortem per Division ')
-            ->labels($pendingPostmortemName)
-            ->values($total_Count_per_Pending)
-            ->dimensions(1000, 500)
-            ->backgroundcolor("#ECF0F5")
-            ->responsive(true);
-
-        $notApproved_bar = Charts::create('donut', 'google')
-            ->title(' Pauper s Burial Not Approved per Division')
-            ->elementLabel('Not Approved per Division')
-            ->labels($burial_NotApprovedName)
-            ->values($total_Count_per_NotApproved)
-            ->dimensions(1000, 500)
-            ->backgroundcolor("#ECF0F5")
-            ->responsive(true);
-
-
-
-
-
-
-        //$s=$this->divisionOverThirstyDays();
-
-        $post_mortem_pending = $this->post_mortem_pending();
-        $burial_request = $this->burial_request();
-        $burial_NotApproved = $this->burial_NotApproved();
-        $overThirtyDays = 0;
-        $corpses = Corpse::whereDate('pickup_date', '!=', '')->get();
-        foreach ($corpses as $corpse) {
-            if ($this->storageday($corpse->pickup_date, $corpse->burial_date) >= 30  ) {
-
-                $overThirtyDays++;
-                //$storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date) ,'Name'=> $corpse->first_name.'  '.$corpse->last_name );
-            }
-        }
-
-
-
-
-
-
-        return View('/dashboard', compact('chart', 'bar', 'pie', 'notApproved_bar', 'overThirtyDays', 'post_mortem_pending', 'burial_request', 'burial_NotApproved'))->render();
-    }
-
-
-
-
-
-    public function divisionOverThirstyDays()
-    {
-        $corpses = Corpse::get();
-        $overThirtyDays = 0;
-        $dataCompact[] = null;
-        $div[] = '';
-        // $totalCountPerDiv[]='';
-        // $divisionName[]='';
-        // $notBuriedName[]='';
-        // $totalCountNotBuriedCompact[]='';
-        // $pendingPostmortemName[]='';
-        // $ToatalPendingPostmortemCompact[]='';
-        // $burial_NotApprovedName[]='';
-        // $totalBurial_NotApprovedCompact[]='';
-
-
-        $pendingPostmortem[] = null;
-        $pendingPostmortemCompact[] = null;
-        $burial_NotApproved[] = null;
-        $burial_NotApprovedCompact[] = null;
-
-
-        $notBuried[] = null;
-        $notBuriedCompact[] = null;
-
-
-
-
-
-
-        foreach ($corpses as $corpse) {
-
-
-
-            if ($corpse->pauper_burial_approved == 'No') {
-                $burial_NotApproved[$corpse->division_id] = $corpse->station->division->division;
-                $burial_NotApprovedCompact[] =  array(
-                    'id' => $corpse->id,
-                    'division_id' => $corpse->division_id,
-                    'Division' => $corpse->station->division->division,
-                    'Days' => $days = $this->storageday($corpse->pickup_date, $corpse->burial_date),
-                    'Name' => $corpse->first_name . '  ' . $corpse->last_name
-                );
-            }
-
-            if ($corpse->postmortem_status == 'Pending') {
-                $pendingPostmortem[$corpse->division_id] = $corpse->station->division->division;
-                $pendingPostmortemCompact[] =  array(
-                    'id' => $corpse->id,
-                    'division_id' => $corpse->division_id,
-                    'Division' => $corpse->station->division->division,
-                    'Days' => $days = $this->storageday($corpse->pickup_date, $corpse->burial_date),
-                    'Name' => $corpse->first_name . '  ' . $corpse->last_name
-                );
-            }
-
-
-
-
-            if ($corpse->burial_date == '') {
-                $notBuried[$corpse->division_id] = $corpse->station->division->division;
-                $notBuriedCompact[] =  array(
-                    'id' => $corpse->id,
-                    'division_id' => $corpse->division_id,
-                    'Division' => $corpse->station->division->division,
-                    'Days' => $days = $this->storageday($corpse->pickup_date, $corpse->burial_date),
-                    'Name' => $corpse->first_name . '  ' . $corpse->last_name
-                );
-            }
-
-
-            if ($this->storageday($corpse->pickup_date, $corpse->burial_date)  >= 30 && $corpse->burial_date == '') {
-                $overThirtyDays++;
-                $now = date('Y-m-d'); // Carbon::now();
-
-                $div[$corpse->division_id] = $corpse->station->division->division;
-
-                $dataCompact[] =  array(
-                    'id' => $corpse->id,
-                    'division_id' => $corpse->division_id,
-                    'Division' => $corpse->station->division->division,
-                    'Days' => $days = $this->storageday($corpse->pickup_date, $corpse->burial_date),
-                    'Name' => $corpse->first_name . '  ' . $corpse->last_name
-                );
-            }
-        }
-        $data = array(
-            'totalCountPerDiv' => $dataCompact,
-            'divisionName' => $div,
-            'notBuriedName' => $notBuried,
-            'totalCountNotBuriedCompact' => $notBuriedCompact,
-            'pendingPostmortemName' => $pendingPostmortem,
-            'ToatalPendingPostmortemCompact' => $pendingPostmortemCompact,
-            'burial_NotApprovedName' => $burial_NotApproved,
-            'totalBurial_NotApprovedCompact' => $burial_NotApprovedCompact
-        );
-
-        return    $data;
-    }
-
-
-
-
-    public function myChart()
-    {
-        $data = $this->divisionOverThirstyDays();
-
-        $countTotalTimeDivAppear = [];
-        //
-        $pendingPostmortemName = [];
-        $burial_NotApprovedName = [];
-        $notBuriedDivNames=[];
-
-        foreach ($data['totalCountPerDiv'] as $key => $value) {
-
-            if ($value['division_id'] != null) {
-                $countTotalTimeDivAppear[] = $value['division_id'];
-            }
-        }
-
-
-        foreach ($data['totalCountNotBuriedCompact'] as $key => $value) {
-
-            if ($value['division_id'] != null) {
-                $notBuriedDivNames[] = $value['division_id'];
-            }else{
-                $notBuriedDivNames[] = $value['division_id'];
-            }
-        }
-
-
-
-        foreach ($data['ToatalPendingPostmortemCompact'] as $key => $value) {
-
-            if ($value['division_id'] != null) {
-                $pendingPostmortemName[] = $value['division_id'];
-            }
-        }
-
-
-
-
-
-        foreach ($data['totalBurial_NotApprovedCompact'] as $key => $value) {
-
-            if ($value['division_id'] != null) {
-                $burial_NotApprovedName[] = $value['division_id'];
-            }
-        }
-
-
-
-
-        $charOne = array(
-            'total_Count_per_division' => array_count_values($countTotalTimeDivAppear),
-            'total_Count_per_NotBuried' => array_count_values($notBuriedDivNames),
-            'total_Count_per_Pending' => array_count_values($pendingPostmortemName),
-            'total_Count_per_NotApproved' => array_count_values($burial_NotApprovedName),
-            'divisionName' => $data['divisionName'],
-            'notBuriedDivNames' =>  $data['notBuriedName'],
-            'pendingPostmortemName' => $data['pendingPostmortemName'],
-            'burial_NotApprovedName' => $data['burial_NotApprovedName'],
-
-        );
-        return   $charOne;
-    }
-
-
-
-
-    public function burial_request()
-    {
-        $burial_request = 0;
-        $corpses = Corpse::where('pauper_burial_approved', '=', 'Processing')->get();
-        foreach ($corpses as $corpse) {
-            $burial_request++;
-        }
-        return $burial_request;
-    }
-
-
-    public function burial_NotApproved()
-    {
-        $burial_NotApproved = 0;
-        $corpses = Corpse::where('pauper_burial_approved', '=', 'No')->get();
-        foreach ($corpses as $corpse) {
-            $burial_NotApproved++;
-        }
-        return $burial_NotApproved;
-    }
-
-    public function post_mortem_pending()
-    {
-        $post_mortem_pending = 0;
-        $corpses = Corpse::where('postmortem_status', '=', 'Pending')->get();
-        foreach ($corpses as $corpse) {
-            $post_mortem_pending++;
-        }
-        return $post_mortem_pending;
-    }
 
     public function storageDayOverThirty($pickup_date)
     {
@@ -1825,12 +919,6 @@ public function checkUniqueCrNo(Request $request){
     echo json_encode($output);
 
 }
-
-
-
-
-
-
 
 
 
@@ -2030,6 +1118,7 @@ public function checkUniqueCrNo(Request $request){
 
             try {
                 $corpDate =   $corpse->save();
+                $this->clearCaches(); 
             } catch (\Throwable $th) {
                     $error_array = ['Error, Something occurred while saving!'];
                 }
@@ -2048,6 +1137,12 @@ public function checkUniqueCrNo(Request $request){
                 try {
 
                     $investigator->save();
+                   
+                    
+
+
+
+
                 } catch (\Throwable $th) {
                     $error_array = ['Error, Something occurred while saving Investigator!'];
                 }
@@ -2074,7 +1169,7 @@ public function checkUniqueCrNo(Request $request){
                 $dna->dna_result= $request->input('dna_result');
                 $dna->save();   
 
-
+                 
                 $success_output = '<div class="alert alert-success"> Saved Sucessfully! </div>';
                 $data = array(
                     "id" => $corpse->id,
@@ -2120,7 +1215,6 @@ public function checkUniqueCrNo(Request $request){
 
         echo json_encode($output);
     }
-
 
 
 
@@ -2303,7 +1397,7 @@ try{
             $corpse->modified_by  = auth()->user()->id;
                try{
                  $corpDate =   $corpse->update();
-
+                             $this->clearCaches();
                }
                 catch (\Throwable $th) {
                     $error_array = ['Error, occurred while updating !'];
@@ -2332,8 +1426,8 @@ try{
                    
                     $summaryUpdate =  Occurrence::findOrFail($corpse->occurrence->id);
                     $summaryUpdate->summary= $request->input('summary');
-                    $summaryUpdate->update(); 
-                
+                    $summaryUpdate->update();
+                                 
                   }
                    catch (\Throwable $th) {
                     return   $error_array = ['Error, occurred while updating Occurrence !'];
@@ -2341,7 +1435,7 @@ try{
 
             
             $corpseUpdated =   Corpse::findOrFail( $request->input('id'));
-
+         
             $success_output = '<div class="alert alert-success"> Updated Sucessfully! </div>';
             $data = array(
                 "id" => $corpse->id,
@@ -2356,7 +1450,7 @@ try{
             $sendTo = User::whereHas('roles', function ($query) {
                 $query->where('name', '=', 'superAdmin');
             })->get();
-
+          
             try{
                 if (\Notification::send($sendTo, new newCorpseNotification($data))) {
                     // return back();
@@ -2408,17 +1502,35 @@ try{
      */
     public function create()
     {
-        $funeralhomes = Funeralhome::all();
+        $funeralhomes =  cache()->remember('Caches_key_CreateCorpseFuneralHome',Session::get('caches_time'), function () {
+            return  Funeralhome::get();
+        });
         $auth_user_div_id= auth()->user()->station->division->id  ;
-        if(!auth()->user()->hasRole('SuperAdmin')){
-           $stations = Station::where('division_id', $auth_user_div_id)->get();
+        if(!auth()->user()->hasRole('SuperAdmin')){  
+           $stations = cache()->remember('Caches_key_CreateCorpseStations',Session::get('caches_time'), function () use( $auth_user_div_id) {
+            return   Station::where('division_id', $auth_user_div_id)->get();
+        });
         }else{
-            $stations = Station::get();
+            $stations = cache()->remember('Caches_key_CreateCorpseStations',Session::get('caches_time'), function () {
+                return   Station::get(); 
+            });
         }
-        $conditions= Condition::get();
-        $manners= Manner::get();
-        $anatomies= Anatomy::get();
-        $ranks =  Rank::all();
+        $conditions= cache()->remember('Caches_key_corpse_create_Condition',Session::get('caches_time'), function () {
+            return Condition::get();   
+        });  
+ 
+        $manners= cache()->remember('Caches_key_CreateCorpseManners',Session::get('caches_time'), function () {
+            return Manner::get();  
+        });   
+
+        $anatomies= cache()->remember('Caches_key_corpse_create_Anatomy',Session::get('caches_time'), function () {
+            return Anatomy::get();  
+        });     
+
+
+        $ranks = cache()->remember('cache_key_RanksCreateCorpse',Session::get('caches_time'), function () {
+            return Rank::get();  
+        });
         return view('corpses.create', compact('funeralhomes', 'ranks','stations','conditions','manners','anatomies'));
     }
 
@@ -2499,7 +1611,6 @@ try{
     {
         $corpse =  Corpse::findOrFail( $this->test_input($id));
         // $investigators= Investigator::where('investigators.corpse_id',$corpse->id)->get();
-
         if (empty($corpse)) {
             return redirect(route('corpses.index'))->with('error', 'Corpse Not Found!');
         }
@@ -2520,18 +1631,42 @@ try{
         if (empty($corpse)) {
             return redirect()->with('error', 'Corpse Not Found!');
         }
-        $funeralhomes = Funeralhome::get();
-        $stations = Station::get();
+        $funeralhomes =  cache()->remember('Caches_key_EditCorpseFuneralHome',Session::get('caches_time'), function () {
+            return  Funeralhome::get();
+        });
+
+
+        $auth_user_div_id= auth()->user()->station->division->id  ;
+        if(!auth()->user()->hasRole('SuperAdmin')){  
+           $stations = cache()->remember('Caches_key_EditCorpseStations',Session::get('caches_time'), function () use( $auth_user_div_id) {
+            return   Station::where('division_id', $auth_user_div_id)->get();
+        });
+        }else{
+            $stations = cache()->remember('Caches_key_EditCorpseStations',Session::get('caches_time'), function () {
+                return   Station::get(); 
+            });
+        }
+
+
         $investigators = Investigator::where('corpse_id', '=', $this->test_input( $id))->get();
-        $conditions= Condition::get();
-        $manners= Manner::get();
-        $anatomies= Anatomy::get();
-        $ranks =  Rank::get();
+        $conditions= cache()->remember('Caches_key_corpse_edit_Condition',Session::get('caches_time'), function () {
+            return Condition::get();   
+        });  
+
+         
+        $manners= cache()->remember('Caches_key_EditCorpseManners',Session::get('caches_time'), function () {
+            return Manner::get();  
+        });  
+
+        $anatomies= cache()->remember('Caches_key_corpse_edit_Anatomy',Session::get('caches_time'), function () {
+            return Anatomy::get();   
+        });     
+        $ranks = cache()->remember('Caches_key_RanksEditeCorpse',Session::get('caches_time'), function () {
+            return Rank::get(); // Rank::paginate(10); 
+        });
         $summary= Occurrence::where('corpse_id', $id)->get();
-
         return view('corpses.edit', compact('corpse','summary','funeralhomes', 'ranks','stations','conditions','manners','anatomies','investigators'));
-
-       
+      
     }
 
     /**
@@ -2737,37 +1872,7 @@ try{
     
         echo json_encode($output);
     
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
     }
 
 

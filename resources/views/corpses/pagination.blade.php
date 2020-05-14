@@ -3,8 +3,8 @@
     <table class="table table-striped table-bordered">
         <thead>
       <tr>
-        <th width="5%" class="sorting" data-sorting_type="asc" data-column_name="id" style="cursor: pointer">ID <span id="id_icon"></span></th>
-        <th width="15%" class="sorting" data-sorting_type="asc" data-column_name="last_name" style="cursor: pointer">Name <span id="last_name_icon"></span></th>
+        <th   class="sorting" data-sorting_type="asc" data-column_name="id" style="cursor: pointer">ID <span id="id_icon"></span></th>
+        <th  class="sorting" data-sorting_type="asc" data-column_name="last_name" style="cursor: pointer">Name <span id="last_name_icon"></span></th>
      
         <th scope="col">Date Of Death</th>
         <th scope="col">Pick Up Date</th>
@@ -18,11 +18,11 @@
         <th scope="col">Excess</th>
         <th scope="col">Action</th>
       </tr>
-    </thead>
-  
-      @include('pagination_data')
- 
-    </table>
+    </thead>    
+      <tbody>  
+          @include('pagination_data')
+      </tbody>
+     </table>
 
  
 
@@ -34,8 +34,7 @@
 
    </div>
   </div>
-  
-@include('corpses.showModal')
+ 
 
  </body>
 </html>

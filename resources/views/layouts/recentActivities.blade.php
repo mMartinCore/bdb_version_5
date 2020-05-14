@@ -1,15 +1,6 @@
 <link rel="stylesheet" href="{{asset('dist/popover/bootstrap-popover-x.css')}}">
-<script src="{{ asset('dist/popover/bootstrap-popover-x.js')}}"></script>
-
-
-
-
-
-
-
-
-
-
+{{-- <script src="{{ asset('dist/popover/bootstrap-popover-x.js')}}"></script> --}}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-popover-x@1.4.7/js/bootstrap-popover-x.min.js"></script>
  <!-- PopoverX content -->
  <div id="myPopover2" class="popover popover-x popover-danger">
     <div class="arrow"></div>
@@ -24,9 +15,7 @@
     <th scope="col"> Name<a class="column_sort sorting_name" id="nameSort" data-order="desc" href="#">&nbsp;</a></th>
     <th scope="col">Date Of Death</th>
     <th scope="col">Pick Up Date</th>
-
     <th scope="col">Post Mortem</th>
-
     <th scope="col">Requested</th>
     <th scope="col">Approved</th>
     <th scope="col">Buried</th>
@@ -72,6 +61,12 @@ function load_data()
                 }
            })
       }
-</script>
+</script> 
 
-@include('show_modal')
+
+
+
+
+
+
+

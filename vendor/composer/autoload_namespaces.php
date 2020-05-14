@@ -6,7 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'UpdateHelper\\' => array($vendorDir . '/kylekatarnls/update-helper/src'),
     'Parsedown' => array($vendorDir . '/erusev/parsedown'),
+    'JacobBennett\\Pjax' => array($vendorDir . '/jacobbennett/pjax/src'),
     'Evenement' => array($vendorDir . '/evenement/evenement/src'),
 );

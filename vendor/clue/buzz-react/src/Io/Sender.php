@@ -124,19 +124,28 @@ class Sender
 
         if ($body instanceof ReadableStreamInterface) {
             if ($body->isReadable()) {
-                if ($size !== null) {
-                    // length is known => just write to request
-                    $body->pipe($requestStream);
-                } else {
-                    // length unknown => apply chunked transfer-encoding
-                    // this should be moved somewhere else obviously
-                    $body->on('data', function ($data) use ($requestStream) {
-                        $requestStream->write(dechex(strlen($data)) . "\r\n" . $data . "\r\n");
-                    });
-                    $body->on('end', function() use ($requestStream) {
-                        $requestStream->end("0\r\n\r\n");
-                    });
+                // length unknown => apply chunked transfer-encoding
+                if ($size === null) {
+                    $body = new ChunkedEncoder($body);
                 }
+
+                // pipe body into request stream
+                // add dummy write to immediately start request even if body does not emit any data yet
+                $body->pipe($requestStream);
+                $requestStream->write('');
+
+                $body->on('close', $close = function () use ($deferred, $requestStream) {
+                    $deferred->reject(new \RuntimeException('Request failed because request body closed unexpectedly'));
+                    $requestStream->close();
+                });
+                $body->on('error', function ($e) use ($deferred, $requestStream, $close, $body) {
+                    $body->removeListener('close', $close);
+                    $deferred->reject(new \RuntimeException('Request failed because request body reported an error', 0, $e));
+                    $requestStream->close();
+                });
+                $body->on('end', function () use ($close, $body) {
+                    $body->removeListener('close', $close);
+                });
             } else {
                 // stream is not readable => end request without body
                 $requestStream->end();

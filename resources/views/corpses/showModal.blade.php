@@ -9,6 +9,10 @@
                 text-align: center;
                 cursor:pointer;
                 color:#fff;
+                display: none;
+            }
+            #modalbody {
+                display: none;
             }
 
         </style>
@@ -23,7 +27,7 @@
                 CLOSE MODAL HERE
             </div>
 
-            <div class="modal-content">
+            <div id="modalbody" class="modal-content">
                 <!--Your modal content goes here-->
                 <div id="load_show_view">
 
@@ -44,8 +48,11 @@
                 // Callbacks
                 beforeOpen: function() {
                 //    alert("The animation was called");
+                document.getElementById('btn-close-modal').style.display = "block";  
+                document.getElementById('modalbody').style.display = "block";              
                 },
-                afterOpen: function() {
+                afterOpen: function() {                    
+       
                   //  alert("The animation is completed");
                 },
                 beforeClose: function() {
@@ -54,96 +61,11 @@
                 },
                 afterClose: function() {
                     $("#load_show_view").html("");
+                    document.getElementById('btn-close-modal').style.display = "none";
+                    document.getElementById('modalbody').style.display = "none";
               //    alert("The animation is completed");
                 }
             });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getViewId(id) {
-    var url =window.location.protocol+"//"+window.location.hostname+"/corpses/"+id;
-$("#load_show_view").load(url, function(responseTxt, statusTxt, xhr){
-    if(statusTxt == "success")
-        {
-            document.getElementById('demo02').click(); // Works!
-            return false;
-    }
-    if(statusTxt == "error"){
-        Command: toastr["error"]("Inconceivable!","Error: " + xhr.status + ": " + xhr.statusText)
-
-        toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": true,
-        "positionClass": "toast-top-center",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "900",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-        }
-
-    }
-    return false;
-
-    });
-}
-
-
-
-function getViewId_view_Notify(id) {
-    var url =window.location.protocol+"//"+window.location.hostname+"/corpses/"+id;
-$("#load_show_view").load(url, function(responseTxt, statusTxt, xhr){
-    if(statusTxt == "success")
-        {
-            document.getElementById('demo02').click(); // Works!
-            return false;
-    }
-    if(statusTxt == "error"){
-
-        Command: toastr["error"]("Inconceivable!","Error: " + xhr.status + ": " + xhr.statusText)
-
-        toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": true,
-        "positionClass": "toast-top-center",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "900",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-        }
-
-    }
-    return false;
-
-    });
-}
-
 
 
 

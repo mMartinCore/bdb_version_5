@@ -13,8 +13,7 @@ use Session;
 use App\Rank;
 use Illuminate\Support\Facades\Redirect;
 use App\Condition;
-use Prettus\Repository\Criteria\RequestCriteria;
-
+use  Illuminate\Support\Facades\Cache;
 class ConditionController  extends  Controller
 {
 
@@ -27,6 +26,13 @@ class ConditionController  extends  Controller
      * @param Request $request
      * @return Response
      */
+
+          
+    public function clearCaches(){  
+        Cache::forget('Caches_key_corpse_create_Condition'); 
+        Cache::forget('Caches_key_corpse_edit_Condition');  
+        Cache::forget('Caches_key_corpse_index_Condition');          
+    }  
     public function index(Request $request)
     {
 

@@ -86,17 +86,15 @@
                  <td> {{$storagedays }} </td>
                  <td>{{ $excess }} </td>
                  <td>
-             <div class="btn-group no">
+             <div class="btn-group  " >
                     @hasrole('SuperAdmin|Admin|writer')
                        <a href="corpses/{{ $corpse->id}}/edit" class="btn btn-primary btn-xs "><i class="glyphicon glyphicon-edit"></i></a>
                      @endrole
                  @hasrole('SuperAdmin')
                         <a  href="#"  class="btn btn-danger  btn-xs " onclick="getId( {{$corpse->id }} );" >    <i class="glyphicon glyphicon-trash"></i></a>
                  @endrole
-             </div>
-             
-             </td>
-     
+             </div>             
+             </td>     
               @endforeach
       <tr>
        <td colspan="13" align="center">

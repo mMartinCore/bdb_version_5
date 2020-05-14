@@ -14,11 +14,13 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
+        'JacobBennett\Pjax\PjaxMiddleware',
     ];
 
     /**
@@ -36,12 +38,29 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\UserOnline::class,
+
+            \RenatoMarinho\LaravelPageSpeed\Middleware\InlineCss::class,
+            \RenatoMarinho\LaravelPageSpeed\Middleware\ElideAttributes::class,
+            \RenatoMarinho\LaravelPageSpeed\Middleware\InsertDNSPrefetch::class,
+            \RenatoMarinho\LaravelPageSpeed\Middleware\RemoveComments::class,
+            \RenatoMarinho\LaravelPageSpeed\Middleware\TrimUrls::class,
+ 
         ],
 
         'api' => [
             'throttle:60,1',
             'bindings',
         ],
+         'minifiedPage'=>[
+            
+        //     \RenatoMarinho\LaravelPageSpeed\Middleware\InlineCss::class,
+        //     \RenatoMarinho\LaravelPageSpeed\Middleware\ElideAttributes::class,
+        //     \RenatoMarinho\LaravelPageSpeed\Middleware\InsertDNSPrefetch::class,
+        //     \RenatoMarinho\LaravelPageSpeed\Middleware\RemoveComments::class,
+        //     \RenatoMarinho\LaravelPageSpeed\Middleware\TrimUrls::class,
+        //     \RenatoMarinho\LaravelPageSpeed\Middleware\RemoveQuotes::class,
+               \RenatoMarinho\LaravelPageSpeed\Middleware\CollapseWhitespace::class,
+          ]
     ];
 
     /**
@@ -81,4 +100,6 @@ class Kernel extends HttpKernel
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
         \Illuminate\Auth\Middleware\Authorize::class,
     ];
+
+
 }

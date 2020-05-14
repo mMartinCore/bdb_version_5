@@ -3,7 +3,6 @@
 @section('content')
 <link rel="stylesheet" href="{{asset('dist/investigatorEdit.css')}}">
 
-
 <style>
     div {
       font-family: sans-serif;
@@ -44,19 +43,16 @@
     </style>
 
 
-    <script>
-
+    {{-- <script>
     window.addEventListener("load", function () {
         const loader = document.querySelector(".loader");
         loader.className += " hidden"; // class "loader hidden"
     });
 
     </script>
-
-
     <div class="loader">
             <img src="{{asset('/dist/img/LOADING.gif')}}"   alt="Loading...">
-          </div>
+   </div> --}}
 
 
 
@@ -1176,7 +1172,7 @@
 
 
 {!! Form::close() !!}
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br> 
 </div>
 
 
@@ -1311,9 +1307,9 @@
 
 
 
-<script src="{{ asset('corpse/sec2validation.js')}}"></script>
-<script src="{{ asset('corpse/validation.js')}}"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ 
+<script src="{{ asset('corpse/validation_compress.js')}}"></script>
+{{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> --}}
 
 <script>
 $('.trigger, .slider').click(function( e) {
@@ -1324,7 +1320,7 @@ $('.slider').toggleClass('close');
 
 <script>
 
-
+ 
 
 $('.editForm').on('click', function() {
     var $this = $(this);
@@ -1391,16 +1387,9 @@ $('.editForm').on('click', function() {
                   // START
 
                 $(".CoprseSection").slideDown();
-                $(".io").slideUp();
-                $(".CoprseSection2").slideUp();
-                $(".MorgueSection").slideUp();
-                $(".adminSection").slideUp();
-                $(".confirm").slideUp();
-                $(".adminSection").slideUp();
+         
 
-
-
-                ////////////////////////////////
+ 
 
 
                 $("#CoprseSection").click(function(e){

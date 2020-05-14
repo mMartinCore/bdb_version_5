@@ -14,7 +14,7 @@ use App\Rank;
 use Illuminate\Support\Facades\Redirect;
 use App\Funeralhome;
 use Prettus\Repository\Criteria\RequestCriteria;
-
+use Illuminate\Support\Facades\Cache;
 class FuneralhomeController  extends  Controller
 {
 
@@ -27,6 +27,15 @@ class FuneralhomeController  extends  Controller
      * @param Request $request
      * @return Response
      */
+
+    public function clearCaches(){
+        Cache::forget('Caches_key_CreateCorpseFuneralHome'); 
+        Cache::forget('Caches_key_EditCorpseFuneralHome'); 
+        Cache::forget('Caches_key_CorpseIndexFuneralHome'); 
+        
+    }  
+
+
     public function index(Request $request)
     {
 
@@ -63,7 +72,7 @@ class FuneralhomeController  extends  Controller
          $funeralhome->user_id=$request->user_id = auth()->user()->id;
          $funeralhome->modify_by = $request->modify_by = 0;
          $funeralhome->save();
-
+         $this->clearCaches(); 
          Session::flash('success','Funeral Home added successfully.');
 
         return redirect(route('funeralhomes.index'));
@@ -123,7 +132,7 @@ class FuneralhomeController  extends  Controller
        $funeralhome->funeralhome= $request->funeralhome;
        $funeralhome->modify_by = $request->modify_by = auth()->user()->id;
        $funeralhome->save();
-
+       $this->clearCaches(); 
        Session::flash('success','Funeral home updated successfully.');
         return redirect(route('funeralhomes.index'));
     }
@@ -159,7 +168,7 @@ class FuneralhomeController  extends  Controller
               }  
               /////////////////////////
        $funeralhome->delete($id);
-
+       $this->clearCaches(); 
        Session::flash('success','Funeral home deleted successfully.');
 
         return redirect(route('funeralhomes.index'));

@@ -14,7 +14,7 @@ use App\Rank;
 use Illuminate\Support\Facades\Redirect;
 use App\Manner;
 use Prettus\Repository\Criteria\RequestCriteria;
-
+use Illuminate\Support\Facades\Cache;
 class MannerController  extends  Controller
 {
 
@@ -27,6 +27,13 @@ class MannerController  extends  Controller
      * @param Request $request
      * @return Response
      */
+    
+    public function clearCaches(){
+        Cache::forget('Caches_key_CreateCorpseManners'); 
+        Cache::forget('Caches_key_EditCorpseManners'); 
+        Cache::forget('Caches_key_CorpseIndexManners');         
+    }  
+
     public function index(Request $request)
     {
 
@@ -63,7 +70,7 @@ class MannerController  extends  Controller
          $manner->user_id=$request->user_id = auth()->user()->id;
          $manner->modify_by = $request->modify_by = 0;
          $manner->save();
-
+         $this->clearCaches(); 
          Session::flash('success','Manner  added successfully.');
 
         return redirect(route('manners.index'));
@@ -123,7 +130,7 @@ class MannerController  extends  Controller
        $manner->manner= $request->manner;
        $manner->modify_by = $request->modify_by = auth()->user()->id;
        $manner->save();
-
+       $this->clearCaches(); 
        Session::flash('success','Manner  updated successfully.');
         return redirect(route('manners.index'));
     }
@@ -159,10 +166,9 @@ class MannerController  extends  Controller
               }  
               /////////////////////////
 
-       $manner->delete($id);
-
-       Session::flash('success','Manner  deleted successfully.');
-
-        return redirect(route('manners.index'));
+                $manner->delete($id);
+                $this->clearCaches(); 
+                Session::flash('success','Manner  deleted successfully.');
+                return redirect(route('manners.index'));
     }
 }

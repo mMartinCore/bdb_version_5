@@ -14,7 +14,7 @@ use App\Rank;
 use Illuminate\Support\Facades\Redirect;
 use App\Parish;
 use Prettus\Repository\Criteria\RequestCriteria;
-
+use Illuminate\Support\Facades\Cache;
 class ParishController extends  Controller
 {
 
@@ -31,12 +31,12 @@ class ParishController extends  Controller
      * @return Response
      */
     public function index(Request $request)
-    {
-
-       $parishs =  Parish:: paginate(10);
-
-
-        return view('parishes.index')            ->with('parishes',$parishs);
+    {    
+        $parishs = cache()->remember('Caches_key_parishes',Session::get('caches_time'), function () {
+            return   Parish::get();//Parish:: paginate(10);
+        });
+   
+        return view('parishes.index')->with('parishes',$parishs);
     }
 
     /**
@@ -99,14 +99,14 @@ class ParishController extends  Controller
      */
     public function edit($id)
     {
+
        $parish = Parish::find($id);
 
         if (empty($parish)) {
             Session::flash('error','Parish not found');
-
             return redirect(route('parishes.index'));
-        }
-
+        }           
+     
         return view('parishes.edit')->with('parish',$parish);
     }
 
@@ -129,6 +129,10 @@ class ParishController extends  Controller
        $parish->parish= $request->parish;
        $parish->modify_by = $request->modify_by = auth()->user()->id;
        $parish->save();
+
+       Cache::forget('Caches_key_parishes');
+       Cache::forget('cache_key_parish_corpse_index');
+       Cache::forget('cache_key_parish_corpse_division'); 
 
        Session::flash('success','Parish updated successfully.');
         return redirect(route('parishes.index'));
@@ -166,6 +170,10 @@ class ParishController extends  Controller
        $parish->delete($id);
 
        Session::flash('success','Parish deleted successfully.');
+
+       Cache::forget('Caches_key_parishes');
+       Cache::forget('cache_key_parish_corpse_index');
+       Cache::forget('cache_key_parish_corpse_division'); 
 
         return redirect(route('parishes.index'));
     }

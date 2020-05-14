@@ -16,8 +16,7 @@
     <br><br>
 
        <div class="row">
-
-    @hasrole('SuperAdmin|Admin')
+ 
         <div class="col-sm-3 col-xs-6">
           <!-- small box -->
           <div class="small-box bg-red">
@@ -78,7 +77,7 @@
           </div>
         </div>
         <!-- ./col --> 
-        @endrole
+ 
       <br>
 
       @hasrole('SuperAdmin')

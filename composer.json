@@ -13,17 +13,18 @@
         "consoletvs/charts": "5.*",
         "fideloper/proxy": "^4.0",
         "intervention/image": "^2.5",
+        "jacobbennett/pjax": "~1.0",
+        "kylekatarnls/laravel-carbon-2": "^1.0.0",
         "laravel/framework": "5.7.28",
         "laravel/passport": "^7.0",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^5.4.0",
         "livewire/livewire": "^1.0",
         "maatwebsite/excel": "^3.1",
+        "nesbot/carbon": "2.33.0 as 1.39.0",
         "pusher/pusher-php-server": "~3.0",
+        "renatomarinho/laravel-page-speed": "^1.18",
         "spatie/laravel-permission": "^2.29",
-      
-        "kylekatarnls/laravel-carbon-2": "^1.0.0",
-        "nesbot/carbon": "2.0.0-beta.2 as 1.25.0",
         "unisharp/laravel-ckeditor": "^4.7"
     },
     "require-dev": {

@@ -218,9 +218,25 @@ $browser->get($uri)->then(function (ResponseInterface $response) {
 ```
 
 Similarly, you can use a negative timeout value to not apply a timeout at all
-or use a `null` value to restore the default handling. Note that the underlying
-connection may still impose a different timeout value. See also
-[`Browser`](#browser) above and [`withOptions()`](#withoptions) for more details.
+or use a `null` value to restore the default handling.
+See also [`withOptions()`](#withoptions) for more details.
+
+If you're using a [streaming response body](#streaming), the time it takes to
+receive the response body stream will not be included in the timeout. This
+allows you to keep this incoming stream open for a longer time, such as when
+downloading a very large stream or when streaming data over a long-lived
+connection.
+
+If you're using a [streaming request body](#streaming), the time it takes to
+send the request body stream will not be included in the timeout. This allows
+you to keep this outgoing stream open for a longer time, such as when uploading
+a very large stream.
+
+Note that this timeout handling applies to the higher-level HTTP layer. Lower
+layers such as socket and DNS may also apply (different) timeout values. In
+particular, the underlying socket connection uses the same `default_socket_timeout`
+setting to establish the underlying transport connection. To control this
+connection timeout behavior, you can [inject a custom `Connector`](#browser).
 
 #### Authentication
 
@@ -242,7 +258,7 @@ $promise = $browser->get('https://user:pass@example.com/api');
 
 Note that special characters in the authentication details have to be
 percent-encoded, see also [`rawurlencode()`](https://www.php.net/manual/en/function.rawurlencode.php).
-This example will automatically pass the base64-encoded authentiation details
+This example will automatically pass the base64-encoded authentication details
 using the outgoing `Authorization: Basic …` request header. If the HTTP endpoint
 you're talking to requires any other authentication scheme, you can also pass
 this header explicitly. This is common when using (RESTful) HTTP APIs that use
@@ -399,7 +415,7 @@ $streamingBrowser->get($url)->then(function (ResponseInterface $response) {
 });
 ```
 
-See also the [stream bandwidth example](examples/91-stream-bandwidth.php) and
+See also the [stream download example](examples/91-benchmark-download.php) and
 the [stream forwarding example](examples/21-stream-forwarding.php).
 
 You can invoke the following methods on the message body:
@@ -482,6 +498,10 @@ $loop->addTimer(1.0, function () use ($body) {
 
 $browser->post($url, array('Content-Length' => '11'), $body);
 ```
+
+If the streaming request body emits an `error` event or is explicitly closed
+without emitting a successful `end` event first, the request will automatically
+be closed and rejected.
 
 #### submit()
 
@@ -701,7 +721,7 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/buzz-react:^2.6
+$ composer require clue/buzz-react:^2.7
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.

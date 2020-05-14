@@ -11,12 +11,21 @@ use Illuminate\Support\Facades\Redirect;
 use App\Station;
 use App\Division;
 use Prettus\Repository\Criteria\RequestCriteria;
-
+use Illuminate\Support\Facades\Cache;
 class StationController extends  Controller
 {
     public function __construct() {
         $this->middleware(['auth', 'isAdmin']);
     }
+
+
+    public function clearCaches(){
+        Cache::forget('Caches_key_CreateCorpseStations'); 
+        Cache::forget('Caches_key_EditCorpseStations'); 
+        Cache::forget('Caches_key_CorpseIndexStations');         
+    }  
+
+
 
     public function index(Request $request)    {
         $divisions= Division::get();
@@ -31,7 +40,10 @@ class StationController extends  Controller
      */
     public function create()
     {
-        $divisions= Division::get();
+        $divisions= cache()->remember('Caches_key_station_create_Division',Session::get('caches_time'), function () {
+            return   Division::get();
+        });
+             
         return view('stations.create')->withDivisions($divisions);
     }
 
@@ -56,7 +68,7 @@ class StationController extends  Controller
           $station->user_id=$request->user_id = auth()->user()->id;
           $station->modify_by =0;// $request->modify_by = 0;
           $station->save();
-
+          $this->clearCaches(); 
          Session::flash('success','Station added successfully.');
 
         return redirect(route('stations.index'));
@@ -76,7 +88,10 @@ class StationController extends  Controller
             Session::flash('error','Station not found');
             return redirect(route('stations.index'));
         }
-        $divisions= Division::get();
+        $divisions= cache()->remember('Caches_key_station_show_Division',Session::get('caches_time'), function () {
+            return   Division::get();
+        });
+              
         return view('stations.show')->withStation($station)->withDivisions($divisions);
     }
 
@@ -97,7 +112,9 @@ class StationController extends  Controller
             return redirect(route('stations.index'));
         }
 
-        $divisions= Division::get();
+        $divisions= cache()->remember('Caches_key_station_edit_Division',Session::get('caches_time'), function () {
+            return   Division::get();
+        });
         return view('stations.edit')->withStation($station)->withDivisions($divisions);
     }
 
@@ -128,7 +145,7 @@ class StationController extends  Controller
         $station->division_id= $request->division_id;
         $station->modify_by = $request->modify_by = auth()->user()->id;
         $station->save();
-
+        $this->clearCaches(); 
        Session::flash('success','Station updated successfully.');
         return redirect(route('stations.index'));
     }
@@ -163,7 +180,7 @@ class StationController extends  Controller
        }  
        /////////////////////////
         $station->delete($id);
-
+        $this->clearCaches(); 
        Session::flash('success','Station deleted successfully.');
 
         return redirect(route('stations.index'));

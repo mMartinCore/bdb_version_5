@@ -16,7 +16,7 @@ use App\Division;
 use App\Investigator;
 use App\User;
 use Prettus\Repository\Criteria\RequestCriteria;
-
+use Illuminate\Support\Facades\Cache;
 class RanksController extends  Controller
 {
 
@@ -31,12 +31,24 @@ class RanksController extends  Controller
      * @param Request $request
      * @return Response
      */
+
+    public function clearCaches(){
+        Cache::forget('Caches_key_RanksEditeCorpse');
+        Cache::forget('cache_key_RanksCreateCorpse');
+        Cache::forget('cache_key_RanksCorpseIndex');
+        Cache::forget('Caches_key_ranks');
+    }  
+
+
     public function index(Request $request)
     {
+      
 
-        $ranks =  Rank::paginate(10);
+        $ranks = cache()->remember('Caches_key_ranks',Session::get('caches_time'), function () {
+            return Rank::get(); // Rank::paginate(10); 
+        });
 
-        return view('ranks.index')            ->with('ranks', $ranks);
+        return view('ranks.index')->with('ranks', $ranks);
     }
 
     /**
@@ -67,7 +79,7 @@ class RanksController extends  Controller
          $rank->user_id=$request->user_id = auth()->user()->id;
          $rank->modify_by = 0;// $request->modify_by = 0;
          $rank->save();
-
+         $this->clearCaches(); 
          Session::flash('success','Rank added successfully.');
 
         return redirect(route('ranks.index'));
@@ -129,7 +141,7 @@ class RanksController extends  Controller
        $rank->rank= $request->rank;
        $rank->modify_by = $request->modify_by = auth()->user()->id;
        $rank->save();
-
+       $this->clearCaches(); 
        Session::flash('success','Rank updated successfully.');
         return redirect(route('ranks.index'));
     }
@@ -177,7 +189,7 @@ class RanksController extends  Controller
     }  
        /////////////////////////
       $rank->delete($id);
-
+      $this->clearCaches(); 
        Session::flash('success','rank deleted successfully.');
 
         return redirect(route('ranks.index'));

@@ -1,74 +1,17 @@
 
 
 
-<style>
-#pagination_link a.active{
-background-color:red;
-
-color: aliceblue;
-border: none;
-color: white;
-font-weight: bolder;
-text-decoration: none;
-border-radius: 5px;
-text-align: center;
-height:2px; width:5px; padding:3px;
-}
-</style>
+ 
 
 
 <span id="error"></span>
 <div class="table-responsive">
 <small>Total record(s): <b> {{$total_records}}</small></b>
-
-
-  {{-- <table id="corpses-table" class="table table-hover stripe" id="commendations-table ">       <thead>
-
-        <thead  style="width:100%;border-collapse:collapse;background-color:#3c8dbc; font-size:small; color:white" >
-            <tr>
-        <th scope="col">ID No.</th>
-        <th scope="col"> Name<a class="column_sort sorting_name" id="nameSort" data-order="desc" href="#">&nbsp;</a></th>
-        <th scope="col">Date Of Death</th>
-        <th scope="col">Pick Up Date</th>
-        <th scope="col">Anatomy</th>
-        <th scope="col">Post Mortem</th>
-        <th scope="col">Division</th>
-        <th scope="col">Requested</th>
-        <th scope="col">Approved</th>
-        <th scope="col">Buried</th>
-        <th scope="col">Storage</th>
-        <th scope="col">Excess</th>
-        <th scope="col">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-
-        </tbody>
-    </table> --}}
-
-
-
-
-    @include('corpses.pagination')
-
-
-
-
-
-
-
-
-
  
+    @include('corpses.pagination') 
 </div>
-
-
-
-
-
-
-
-<script src="{{ asset('bower_components/jquery/dist/jquery-1.11.1.min.js')}}"></script>
+ 
+{{-- <script src="{{ asset('bower_components/jquery/dist/jquery-1.11.1.min.js')}}"></script> --}}
 <script>
 
 $("#nameSort").html('&nbsp;<span  style="color:lightsteelblue" class="glyphicon glyphicon-arrow-up"></span>');
@@ -126,68 +69,7 @@ $(document).ready(function() {
         $('.opendForm2')[0].reset();
     });
 
-
-
-
-
-
-
-
-    // $('.savedAdvance').click( function(event){
-    //      event.preventDefault();
-    //      $(".load-icon").removeClass("hide");
-    //       $(".loadFormAdvance").attr("disabled", true);
-    //       $(".btnloadFormAdvancetxt").text("Fetching Data Please wait...");
-    //      $("#pageNumForm2").val(1);
-    //     var form_data = $(".opendForm2").serializeArray();
-
-
-    //     $.ajax({
-    //     url:"{{ route('corpses.getCorpse') }}",
-    //     method:"POST",
-    //     data:form_data,
-    // success:function(data){
-
-
-    //        $(".load-icon").addClass("hide");
-    //         $(".loadFormAdvance").attr("disabled", false);
-    //         $(".btnloadFormAdvancetxt").text("Search");
-
-
-    //    $("#count").html(data['cnt']+' of '+data['search_Count_total']);
-
-    //     $("tbody").html(data['table']);
-    //     $("#pagination_link").html(data['pagination_link']);
-    //     $('#error').html(data['except']);
-    //    },
-    //    error: function (jqXHR, exception) {
-    //     var msg = '';
-    //     if (jqXHR.status === 0) {
-    //         msg = 'Not connect.\n Verify Network.';
-    //     } else if (jqXHR.status == 404) {
-    //         msg = 'Requested page not found. [404]';
-    //     } else if (jqXHR.status == 500) {
-    //         msg = 'Internal Server Error [500].';
-    //     } else if (exception === 'parsererror') {
-    //         msg = 'Requested JSON parse failed.';
-    //     } else if (exception === 'timeout') {
-    //         msg = 'Time out error.';
-    //     } else if (exception === 'abort') {
-    //         msg = 'Ajax request aborted.';
-    //     } else {
-    //         msg = 'Uncaught Error.\n' + jqXHR.responseText;
-    //     }
-    //     $('#error').html(msg);
-    // }
-
-    //    });
-    // });
-
-
-
-
-
-
+ 
 
 
 
@@ -208,15 +90,7 @@ $(document).ready(function() {
                 }
            })
       }
-    //   $(document).on('click', '.pagination_link', function(){
-    //        var page = $(this).attr("id");
-
-    //        load_data(page);
-    //   });
-
-
-
-
+ 
 
     $(document).on('click', '.pagination_link', function(event){
          event.preventDefault();
@@ -416,9 +290,7 @@ function getCorpse(corpse_id) {
 
 
 
-
-<script src="{{ asset('bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{ asset('bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
+ 
 
 <script>
 

@@ -13,9 +13,7 @@
 
         <div class=" myStyle col-md-8">
             <div class="card">
-
                 <div class="card-body">
-
                         <h3 style="text-align:center; box-sizing: border-box; font-family: sans-serif; font-weight: 500; line-height: 1.1;
                          color: #333333; margin-top: 20px; margin-bottom: 10px; font-size: 30px; background-color: #ecf0f5; ">You Just Read update Corpse Notification</h3>
                         <hr>
@@ -36,9 +34,6 @@
                 </div>
             </div>
         </div>
-
-
-
 </div>
 </div>
 @endsection

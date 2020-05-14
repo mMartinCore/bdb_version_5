@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Redirect;
 use App\Division;
 use App\Parish;
 use Prettus\Repository\Criteria\RequestCriteria;
-
+use Illuminate\Support\Facades\Cache;
 class DivisionController extends  Controller
 {
 
@@ -30,6 +30,20 @@ class DivisionController extends  Controller
      * @param Request $request
      * @return Response
      */
+
+
+    public function clearCaches(){
+ 
+        Cache::forget('Caches_key_CorpseIndexDivision'); 
+        Cache::forget('Caches_key_station_create_Division'); 
+        Cache::forget('Caches_key_station_edit_Division'); 
+        Cache::forget('Caches_key_station_show_Division'); 
+
+        Cache::forget('Caches_key_corpse_index_Division');  
+        
+    }  
+
+
     public function index(Request $request)
     {
 
@@ -45,9 +59,11 @@ class DivisionController extends  Controller
      */
     public function create()
     {
-         $parishes= Parish::get();
-
-
+         
+        $parishes = cache()->remember('cache_key_parish_corpse_division',Session::get('caches_time'), function () {
+            return   Parish::get();
+        });
+               
         return view('divisions.create')->with('parishes',$parishes);
     }
 
@@ -70,7 +86,7 @@ class DivisionController extends  Controller
           $division->user_id= $request->user_id = auth()->user()->id;
           $division->modify_by = $request->modify_by = 0;
           $division->save();
-
+          $this->clearCaches(); 
          Session::flash('success','Division added successfully.');
 
         return redirect(route('divisions.index'));
@@ -138,7 +154,7 @@ class DivisionController extends  Controller
         $division->parish_id= $request->parish;
         $division->modify_by = $request->modify_by = auth()->user()->id;
         $division->save();
-
+        $this->clearCaches(); 
        Session::flash('success','Division updated successfully.');
         return redirect(route('divisions.index'));
     }
@@ -177,7 +193,7 @@ class DivisionController extends  Controller
 
 
         $division->delete($id);
-
+        $this->clearCaches(); 
        Session::flash('success','Division deleted successfully.');
 
         return redirect(route('divisions.index'));

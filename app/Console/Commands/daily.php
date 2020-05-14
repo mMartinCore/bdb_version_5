@@ -85,7 +85,7 @@ class daily extends Command
 
                     $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
                     $sendTo = User::whereHas('roles', function ($query) {
-                        $query->where('name', '=', 'superAdmin')->orWhere('name', '=', 'Admin');
+                        $query->where('name', '=', 'superAdmin');
                     })->get();
 
                     $data = array(
@@ -117,6 +117,64 @@ class daily extends Command
 
 
 
+
+
+
+
+
+    
+
+    public function thirty_Over_days_div_Admin()
+    {
+        $storagedays=array();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
+            foreach ($corpses as $corpse) {
+                    if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) >= 30 && $corpse->burial_date =='')
+                    {  $name='';
+                        if ($corpse->first_name =='Unidentified') {
+                            if ($corpse->suspected_name!=''){
+                                $name='* '.$corpse->suspected_name.' *';
+                            }else{
+                                $name='Unidentified';
+                            }
+                        } else {
+                            $name= $corpse->first_name.'  '.$corpse->last_name ;
+                        }
+
+                    $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
+                    $sendTo = User::whereHas('roles', function ($query) {
+                        $query->where('name', '=', 'Admin');
+                    })->get();
+
+                    $data = array(
+                        "id" => $corpse->id,
+                        "type" => 'Overthirty',
+                        "name" =>  $name,
+                        'location'=>$corpse->pickup_location,
+                        'pickupdate'=>$corpse->pickup_date,
+                        'station' => $corpse->station->station,
+                        "division" => $corpse->station->division->division,
+                        "parish" => $corpse->parish,
+                      // "user" => auth()->user()->email
+                    );
+
+                    foreach($sendTo as $user){                      
+                        if ($corpse->station->division->id=== $user->division_id) {
+                             event(new overThirtyDays($sendTo,  $data));
+                            if (\Notification::send($sendTo, new newCorpseNotification($data))) { }                   
+                    }      
+ 
+                 }
+        }
+    }
+
+      echo 'DONE !';
+
+    }
+
+
+
+
     public function fifteenDays()
     {
         $storagedays=array();
@@ -139,7 +197,7 @@ class daily extends Command
 
                     $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
                     $sendTo = User::whereHas('roles', function ($query) {
-                        $query->where('name', '=', 'superAdmin')->orWhere('name', '=', 'Admin');
+                        $query->where('name', '=', 'superAdmin');
                     })->get();
 
                     $data = array(
@@ -170,6 +228,56 @@ class daily extends Command
 
 
 
+    public function fifteenDays_div_admin()
+    {
+        $storagedays=array();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
+            foreach ($corpses as $corpse) {
+                    if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) == 15 && $corpse->postmortem_date ==''&& $corpse->burial_date =='')
+                    {  $name='';
+                     if ($corpse->first_name =='Unidentified') {
+
+                            if ($corpse->suspected_name!=''){
+                                    $name='* '.$corpse->suspected_name.' *';
+                                }else{
+                                    $name='Unidentified';
+                                }
+
+                        } else {
+                            $name= $corpse->first_name.'  '.$corpse->last_name ;
+                        }
+
+
+                    $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
+                    $sendTo = User::whereHas('roles', function ($query) {
+                        $query->where('name', '=', 'Admin');
+                    })->get();
+
+                    $data = array(
+                        "id" => $corpse->id,
+                        "type" => 'FifteenDays',
+                        "name" =>  $name,
+                        'location'=>$corpse->pickup_location,
+                        'pickupdate'=>$corpse->pickup_date,
+                        'station' => $corpse->station->station,
+                        "division" => $corpse->station->division->division,
+                        "parish" => $corpse->parish,
+                      // "user" => auth()->user()->email
+                    );
+
+                        foreach($sendTo as $user){                      
+                            if ($corpse->station->division->id=== $user->division_id) {
+                                event(new overThirtyDays($sendTo,  $data));
+                                if (\Notification::send($sendTo, new newCorpseNotification($data))) { }                   
+                        } 
+                    }
+                 }
+        }
+      // dd( $data);
+
+      echo 'DONE !';
+    }
+
 
     public function twentyFiveDays()
     {
@@ -193,7 +301,7 @@ class daily extends Command
 
                     $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
                     $sendTo = User::whereHas('roles', function ($query) {
-                        $query->where('name', '=', 'superAdmin')->orWhere('name', '=', 'Admin');
+                        $query->where('name', '=', 'superAdmin');
                     })->get();
 
                     $data = array(
@@ -214,6 +322,60 @@ class daily extends Command
 
       echo 'DONE !';
     }
+
+
+
+
+    
+    public function twentyFiveDays_div_admin()
+    {
+        $storagedays=array();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
+            foreach ($corpses as $corpse) {
+                    if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) == 25 && $corpse->postmortem_date ==''&& $corpse->burial_date =='')
+                    {  $name='';
+                        if ($corpse->first_name =='Unidentified') {
+
+                            if ($corpse->suspected_name!=''){
+                                $name='* '.$corpse->suspected_name.' *';
+                            }else{
+                                $name='Unidentified';
+                            }
+
+                        } else {
+                            $name= $corpse->first_name.'  '.$corpse->last_name ;
+                     }
+
+
+                    $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
+                    $sendTo = User::whereHas('roles', function ($query) {
+                        $query->where('name', '=', 'Admin');
+                    })->get();
+
+                    $data = array(
+                        "id" => $corpse->id,
+                        "type" => 'TwentyFiveDays',
+                        "name" =>  $name,
+                        'location'=>$corpse->pickup_location,
+                        'pickupdate'=>$corpse->pickup_date,
+                        'station' => $corpse->station->station,
+                        "division" => $corpse->station->division->division,
+                        "parish" => $corpse->parish
+                    );
+
+                    foreach($sendTo as $user){                      
+                        if ($corpse->station->division->id=== $user->division_id) {
+                            event(new overThirtyDays($sendTo,  $data));
+                            if (\Notification::send($sendTo, new newCorpseNotification($data))) { }                   
+                    } 
+                }
+                 }
+        }
+
+      echo 'DONE !';
+    }
+
+
 
 
 
@@ -241,7 +403,7 @@ class daily extends Command
 
                     $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
                     $sendTo = User::whereHas('roles', function ($query) {
-                        $query->where('name', '=', 'superAdmin')->orWhere('name', '=', 'Admin');
+                        $query->where('name', '=', 'superAdmin');
                     })->get();
 
                     $data = array(
@@ -268,6 +430,57 @@ class daily extends Command
 
       echo 'DONE !';
     }
+
+
+
+    public function postmortemCompNotBuried_div_admin()
+    {
+        $storagedays=array();
+        $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
+            foreach ($corpses as $corpse) {
+                    if (  $this->storageday($corpse->pickup_date, $corpse->burial_date) >= 25 && $corpse->postmortem_date !='' && $corpse->postmortem_status =='Completed'&& $corpse->burial_date =='')
+                    {  $name='';
+                     if ($corpse->first_name =='Unidentified') {
+
+                            if ($corpse->suspected_name!=''){
+                                    $name='* '.$corpse->suspected_name.' *';
+                                }else{
+                                    $name='Unidentified';
+                                }
+
+                        } else {
+                            $name= $corpse->first_name.'  '.$corpse->last_name ;
+                        }
+
+
+                    $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
+                    $sendTo = User::whereHas('roles', function ($query) {
+                        $query->where('name', '=', 'Admin');
+                    })->get();
+
+                    $data = array(
+                        "id" => $corpse->id,
+                        "type" => 'PostCompletedNotBuried',
+                        "name" =>  $name,
+                        'location'=>$corpse->pickup_location,
+                        'pickupdate'=>$corpse->pickup_date,
+                        'station' => $corpse->station->station,
+                        "division" => $corpse->station->division->division,
+                        "parish" => $corpse->parish,
+                      // "user" => auth()->user()->email
+                    );
+
+                    foreach($sendTo as $user){                      
+                        if ($corpse->station->division->id=== $user->division_id) {
+                            event(new overThirtyDays($sendTo,  $data));
+                            if (\Notification::send($sendTo, new newCorpseNotification($data))) { }                   
+                    } 
+                   }
+
+                 }
+        }   echo 'DONE !';
+    }
+
 
 public function pending_and_no_postmortem(){
      $now= Carbon::now();
@@ -299,7 +512,7 @@ public function pending_and_no_postmortem(){
 
                             $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
                             $sendTo = User::whereHas('roles', function ($query) {
-                                $query->where('name', '=', 'superAdmin')->orWhere('name', '=', 'Admin');
+                                $query->where('name', '=', 'superAdmin');
                             })->get();
 
                             $data = array(
@@ -326,6 +539,73 @@ public function pending_and_no_postmortem(){
   // dd( $data);
 
   echo 'DONE !';
+}
+
+
+
+
+
+
+
+public function pending_and_no_postmortem_div_admin(){
+    $now= Carbon::now();
+   $storagedays=array();
+   $corpses= Corpse::where('pickup_date', '!=',null)->where('body_status',"Unclaimed")->get();
+       foreach ($corpses as $corpse) {
+
+               if ( $corpse->postmortem_date < $now && $corpse->burial_date == '' && $corpse->postmortem_status=='Pending')
+               {
+
+                       $addThree = Carbon::parse($corpse->postmortem_date);
+                       $pickup_date = Carbon::parse($corpse->postmortem_date);
+                        $addThree->addWeekdays(5);
+                       if( $addThree->from($pickup_date)==5){
+
+                               $name='';
+                           if ($corpse->first_name =='Unidentified') {
+
+                                   if ($corpse->suspected_name!=''){
+                                           $name='* '.$corpse->suspected_name.' *';
+                                       }else{
+                                           $name='Unidentified';
+                                       }
+
+                               } else {
+                                   $name= $corpse->first_name.'  '.$corpse->last_name ;
+                               }
+
+
+                           $storagedays[]=  array( 'id'=>$corpse->id, 'Days'=> $days= $this->storageday($corpse->pickup_date, $corpse->burial_date),'Name'=>  $name );
+                           $sendTo = User::whereHas('roles', function ($query) {
+                               $query->where('name', '=', 'Admin');
+                           })->get();
+
+                           $data = array(
+                               "id" => $corpse->id,
+                               "type" => 'PendingPastNoPostmortem',
+                               "name" =>  $name,
+                               'location'=>$corpse->pickup_location,
+                               'pickupdate'=>$corpse->pickup_date,
+                               'station' => $corpse->station->station,
+                               "division" => $corpse->station->division->division,
+                               "parish" => $corpse->parish,
+                           // "user" => auth()->user()->email
+                           );
+
+                           foreach($sendTo as $user){                      
+                            if ($corpse->station->division->id=== $user->division_id) {
+                                event(new overThirtyDays($sendTo,  $data));
+                                if (\Notification::send($sendTo, new newCorpseNotification($data))) { }                   
+                        } 
+                       }
+    
+
+                       }
+           }
+   }
+ // dd( $data);
+
+ echo 'DONE !';
 
 
 }
@@ -336,13 +616,19 @@ public function pending_and_no_postmortem(){
 
 
 
+
     public function handle()
     {
-      $this->fifteenDays();
-      $this->twentyFiveDays();
-     $this->thirty_Over();
-    $this->pending_and_no_postmortem();
-   $this->postmortemCompNotBuried();
+       $this->fifteenDays();
+       $this->twentyFiveDays_div_admin();
+       $this->fifteenDays_div_admin();
+       $this->twentyFiveDays();
+       $this->thirty_Over();
+       $this->pending_and_no_postmortem();
+       $this->pending_and_no_postmortem_div_admin();
+       $this->postmortemCompNotBuried();
+       $this->postmortemCompNotBuried_div_admin();
+       $this->thirty_Over_days_div_Admin();
     }
 
 

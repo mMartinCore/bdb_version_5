@@ -102,26 +102,24 @@
                         not_id : mynotes.id,
                     mynotes_id :mynotes.data['newCorpse']['id'],
                   };
-
-
-                    axios.post("markAsRead",data).then(response =>{
-                 //       window.location = '{{ url("readNewCorpseNotify/+data.not_id) }}';
-                 //  window.location.href = "{{URL::to('readNewCorpseNotify/')}}"
-                      //   window.location = '{{ url(readNewCorpseNotify/'+data.not_id+')}}'
-                         //  window.location.href = "{!! route('readNewCorpseNotify', data.not_id) !!}";
-                           window.location.href=  window.location.protocol+"//"+window.location.hostname+"/readNewCorpseNotify/"+data.not_id;
-                           //window.location.href = "/readNewCorpseNotify/"+data.not_id;
-                        //window.location="readNewCorpseNotify/"+data.not_id;
-                    });
+                  axios.post("markAsRead",data).then(response =>{  
+                         if( window.location.port===''){
+                             window.location.href=  window.location.protocol+"//"+window.location.hostname+"/readNewCorpseNotify/"+data.not_id; 
+                        }else{ 
+                             window.location.href=window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/readNewCorpseNotify/"+data.not_id; 
+                            }          
+                     });
 
               },
-                  markAllNewCorpseNotifyAsReadx:function() {
-                      axios.post("markAllNewCorpseNotifyAsRead").then(response =>{
-                       window.location.href=  window.location.protocol+"//"+window.location.hostname+"/allReadCorpseNofication";
-                      //  window.location.href="allReadCorpseNofication";
+                      markAllNewCorpseNotifyAsReadx:function() {
+                      axios.post("markAllNewCorpseNotifyAsRead").then(response =>{ 
+                      if( window.location.port===''){
+                            window.location.href= window.location.protocol+"//"+window.location.hostname+"/allReadCorpseNofication";
+                        }else{
+                          window.location.href=window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/allReadCorpseNofication";
+                        } 
                     });
-         }
-
+          }
 
           }
     //     mounted() {
@@ -140,4 +138,4 @@
 
     //     }
     }
-</script>z
+</script>

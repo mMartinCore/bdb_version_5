@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use App\Officer;
 use App\User;
@@ -16,7 +16,7 @@ use Validator;
 use App\Http\Requests\CreateCorpseRequest;
 use App\Corpse;
 use App\Division;
-
+use Session;
 use Flash;
 use App\Funeralhome;
 use Response;
@@ -42,7 +42,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth','minifiedPage']);
     }
 
     /**
@@ -63,7 +63,6 @@ class HomeController extends Controller
     {
         $pickup_date = Carbon::parse($pickupDate);
         $burial_date = Carbon::parse($burialDate);
-
         $now = Carbon::now();
         if (  $burialDate !=null || $burialDate !=null ) {
           return  $burial_date->diffInDays( $pickup_date );
@@ -262,9 +261,14 @@ class HomeController extends Controller
 
         $auth_user_div_id= auth()->user()->station->division->id  ;
         if(!auth()->user()->hasRole('SuperAdmin')){ 
-            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('pickup_date','!=',null)->where('body_status',"Unclaimed")->get();
+            $corpses = cache()->remember('cache_key_dashboard',Session::get('caches_time'), function () use($auth_user_div_id) {
+                return  Corpse::where('division_id', $auth_user_div_id)->where('pickup_date','!=',null)->where('body_status',"Unclaimed")->get();
+            }); 
          }else{
-            $corpses = Corpse::where('pickup_date','!=',null)->where('body_status',"Unclaimed")->get();
+            $corpses = cache()->remember('cache_key_dashboard',Session::get('caches_time'), function () {
+                return  Corpse::where('pickup_date','!=',null)->where('body_status',"Unclaimed")->get();
+            });
+         
          }
 
 
@@ -292,9 +296,15 @@ class HomeController extends Controller
     public function burial_request()
     {      $auth_user_div_id= auth()->user()->station->division->id  ;
         if(!auth()->user()->hasRole('SuperAdmin')){ 
-            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('pauper_burial_approved', '=', 'Processing')->where('body_status',"Unclaimed")->get();
+            $corpses = cache()->remember('cache_key_dashboard_burial_request',Session::get('caches_time'), function () use($auth_user_div_id) {
+                return    Corpse::where('division_id', $auth_user_div_id)->where('pauper_burial_approved', '=', 'Processing')->where('body_status',"Unclaimed")->get();
+            });         
+      
          }else{
-            $corpses = Corpse::where('pauper_burial_approved', '=', 'Processing')->where('body_status',"Unclaimed")->get();
+            $corpses = cache()->remember('cache_key_dashboard_burial_request',Session::get('caches_time'), function ()   {
+                return    Corpse::where('pauper_burial_approved', '=', 'Processing')->where('body_status',"Unclaimed")->get();  
+            });
+          
          }
         $burial_request = 0;     
         foreach ($corpses as $corpse) {
@@ -313,9 +323,14 @@ class HomeController extends Controller
         $burial_NotApproved = 0;
         $auth_user_div_id= auth()->user()->station->division->id  ;
         if(!auth()->user()->hasRole('SuperAdmin')){ 
-            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('pauper_burial_approved', '=', 'No')->where('body_status',"Unclaimed")->get();
-         }else{
-            $corpses = Corpse::where('pauper_burial_approved', '=', 'No')->where('body_status',"Unclaimed")->get();
+            $corpses = cache()->remember('cache_key_dashboard_burial_NotApproved',Session::get('caches_time'), function () use($auth_user_div_id) {
+                return   Corpse::where('division_id', $auth_user_div_id)->where('pauper_burial_approved', '=', 'No')->where('body_status',"Unclaimed")->get();
+                   });   
+         }else{            
+                 $corpses = cache()->remember('cache_key_dashboard_burial_NotApproved',Session::get('caches_time'), function ()   {
+                   return  Corpse::where('pauper_burial_approved', '=', 'No')->where('body_status',"Unclaimed")->get();
+             }); 
+                
          }
 
  
@@ -330,9 +345,15 @@ class HomeController extends Controller
         $post_mortem_pending = 0;
         $auth_user_div_id= auth()->user()->station->division->id  ;
         if(!auth()->user()->hasRole('SuperAdmin')){ 
-            $corpses=Corpse::where('division_id', $auth_user_div_id)->where('postmortem_status', '=', 'Pending')->where('body_status',"Unclaimed")->get();
-         }else{
-            $corpses = Corpse::where('postmortem_status', '=', 'Pending')->where('body_status',"Unclaimed")->get();
+            $corpses = cache()->remember('cache_key_dashboard_post_mortem_pending',Session::get('caches_time'), function () use($auth_user_div_id) {
+            return  Corpse::where('division_id', $auth_user_div_id)->where('postmortem_status', '=', 'Pending')->where('body_status',"Unclaimed")->get();
+            });  
+
+        }else{
+                   $corpses = cache()->remember('cache_key_dashboard_post_mortem_pending',Session::get('caches_time'), function ()  {
+                    return Corpse::where('postmortem_status', '=', 'Pending')->where('body_status',"Unclaimed")->get();
+                });  
+    
          } 
         foreach ($corpses as $corpse) {
             $post_mortem_pending++;
@@ -351,7 +372,9 @@ class HomeController extends Controller
 
     public function divisionOverThirstyDays()
     {
-        $corpses = Corpse::where('body_status',"Unclaimed")->get();
+        $corpses = cache()->remember('cache_key_dashboard_divisionOverThirstyDays',Session::get('caches_time'), function ()  {
+            return  Corpse::where('body_status',"Unclaimed")->get();
+            });  
         $overThirtyDays = 0;
         $dataCompact[] = null;
         $div[] = '';
@@ -548,9 +571,14 @@ public function stationOverThirstyDays()
 {
 
     if(!auth()->user()->hasRole('SuperAdmin')){
-        $corpses = Corpse::where('division_id', auth()->user()->station->division->id  )->where('body_status',"Unclaimed")->get();
+        $corpses = cache()->remember('cache_key_dashboard_stationOverThirstyDays',Session::get('caches_time'), function ()  {
+            return   Corpse::where('division_id', auth()->user()->station->division->id  )->where('body_status',"Unclaimed")->get();
+        });
         }else {
-            $corpses = Corpse::where('body_status',"Unclaimed")->get();
+            $corpses = cache()->remember('cache_key_dashboard_stationOverThirstyDays',Session::get('caches_time'), function ()  {
+                return   Corpse::where('body_status',"Unclaimed")->get();
+                });  
+           
     }
 
     $overThirtyDays = 0;

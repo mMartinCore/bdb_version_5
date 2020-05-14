@@ -1,8 +1,11 @@
 <?php
 
+namespace Clue\Tests\React\Buzz;
+
 use Clue\React\Block;
 use Clue\React\Buzz\Browser;
 use Clue\React\Buzz\Message\ResponseException;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\Factory;
 use React\Http\Response;
@@ -122,6 +125,20 @@ class FunctionalBrowserTest extends TestCase
     public function testTimeoutDelayedResponseShouldReject()
     {
         $promise = $this->browser->withOptions(array('timeout' => 0.1))->get($this->base . 'delay/10');
+
+        Block\await($promise, $this->loop);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Request timed out after 0.1 seconds
+     * @group online
+     */
+    public function testTimeoutDelayedResponseAfterStreamingRequestShouldReject()
+    {
+        $stream = new ThroughStream();
+        $promise = $this->browser->withOptions(array('timeout' => 0.1))->post($this->base . 'delay/10', array(), $stream);
+        $stream->end();
 
         Block\await($promise, $this->loop);
     }
@@ -298,9 +315,7 @@ class FunctionalBrowserTest extends TestCase
         $stream = new ThroughStream();
 
         $this->loop->addTimer(0.001, function () use ($stream) {
-            $stream->emit('data', array('hello world'));
-            $stream->emit('end');
-            $stream->close();
+            $stream->end('hello world');
         });
 
         $response = Block\await($this->browser->post($this->base . 'post', array(), $stream), $this->loop);
@@ -324,6 +339,25 @@ class FunctionalBrowserTest extends TestCase
         $data = json_decode((string)$response->getBody(), true);
 
         $this->assertEquals('hello world', $data['data']);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testPostStreamWillStartSendingRequestEvenWhenBodyDoesNotEmitData()
+    {
+        $server = new StreamingServer(function (ServerRequestInterface $request) {
+            return new Response(200);
+        });
+        $socket = new \React\Socket\Server(0, $this->loop);
+        $server->listen($socket);
+
+        $this->base = str_replace('tcp:', 'http:', $socket->getAddress()) . '/';
+
+        $stream = new ThroughStream();
+        Block\await($this->browser->post($this->base . 'post', array(), $stream), $this->loop);
+
+        $socket->close();
     }
 
     /** @group online */

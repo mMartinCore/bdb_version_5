@@ -2,7 +2,9 @@
 @section('title', '| Permissions')
 
 @section('content')
-
+<script >
+  
+</script>
 
 
  <section  class="content-header">

@@ -22,5 +22,4 @@
     @endforeach
     </tbody>
 </table>
-
-{!! $parishes->links()  !!}
+{{-- {!! $parishes->links()  !!} --}}

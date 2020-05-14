@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.7.0 (2020-02-26)
+
+*   Feature: Add backpressure support and support throttling for streaming outgoing chunked request body.
+    (#148 by @clue)
+
+*   Feature: Start sending outgoing request even when streaming body doesn't emit any data yet.
+    (#150 by @clue)
+
+*   Feature: Only start request timeout timer after streaming request body has been sent (exclude upload time).
+    (#151 and #152 by @clue)
+
+*   Feature: Reject request when streaming request body emits error or closes unexpectedly.
+    (#153 by @clue)
+
+*   Improve download benchmarking script and add new upload benchmark.
+    (#149 by @clue)
+
+## 2.6.1 (2020-01-14)
+
+*   Improve test suite by testing against PHP 7.4 and simplify test setup and test matrix
+    and fix testing redirected request when following relative redirect.
+    (#145 and #147 by @clue)
+
+*   Add support / sponsorship info and fix documentation typo.
+    (#144 by @clue and #133 by @eislambey)
+
 ## 2.6.0 (2019-04-03)
 
 *   Feature / Fix: Add `Content-Length: 0` request header for empty `POST` request etc.

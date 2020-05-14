@@ -4,6 +4,13 @@
 
 Event-driven, streaming HTTP client for [ReactPHP](https://reactphp.org).
 
+> Note that this is a very low-level HTTP client implementation that is currently
+  undergoing some major changes. In the meantime, we recommend using
+  [clue/reactphp-buzz](https://github.com/clue/reactphp-buzz) as a higher-level
+  HTTP client abstraction (which happens to build on top of this project). It
+  provides a Promise-based interface and common PSR-7 message abstraction which
+  makes getting started much easier.
+
 **Table of Contents**
 
 * [Basic usage](#basic-usage)
@@ -164,7 +171,7 @@ The recommended way to install this library is [through Composer](https://getcom
 This will install the latest supported version:
 
 ```bash
-$ composer require react/http-client:^0.5.9
+$ composer require react/http-client:^0.5.10
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.

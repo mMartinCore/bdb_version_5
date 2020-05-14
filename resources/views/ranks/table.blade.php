@@ -22,4 +22,4 @@
     @endforeach
     </tbody>
 </table>
-{!! $ranks->links()  !!}
+{{-- {!! $ranks->links()  !!} --}}

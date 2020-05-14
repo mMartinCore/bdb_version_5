@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' =>   'http://149.28.111.85',
+    'url' =>   'http://127.0.0.1',
 
     'asset_url' => env('ASSET_URL', null),
 

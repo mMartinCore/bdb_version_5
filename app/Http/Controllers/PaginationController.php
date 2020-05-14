@@ -53,28 +53,28 @@ class PaginationController extends Controller
     public  $regNo =null;
     function index()
     { 
-        // $corpses = Corpse::orderBy('created_at', 'desc')->get();
-        $funeralhomes = Funeralhome::get();
-        $auth_user_div_id= auth()->user()->station->division->id  ;
-        $parishes=Parish::get();
-        if(!auth()->user()->hasRole('SuperAdmin')){
-           $stations = Station::where('division_id', $auth_user_div_id)->get();
-        }else{
-            $stations = Station::get();
-        }
+                  // $corpses = Corpse::orderBy('created_at', 'desc')->get();
+        // $funeralhomes = Funeralhome::get();
+        // $auth_user_div_id= auth()->user()->station->division->id  ;
+        // $parishes=Parish::get();
+        // if(!auth()->user()->hasRole('SuperAdmin')){
+        //    $stations = Station::where('division_id', $auth_user_div_id)->get();
+        // }else{
+        //     $stations = Station::get();
+        // }
 
 
-        if(!auth()->user()->hasRole('SuperAdmin')){
-            $divisions = Division::where('id', $auth_user_div_id)->get();
-         }else{
-            $divisions = Division::get();
-         }
-         $corpses=Corpse::paginate(5);
-         $conditions= Condition::get();
-         $manners= Manner::get();
-         $anatomies= Anatomy::get();
-         $ranks =  Rank::all();
-         return view('pagination', compact('funeralhomes', 'parishes','stations','conditions','manners','anatomies','divisions','corpses'))->render();
+        // if(!auth()->user()->hasRole('SuperAdmin')){
+        //     $divisions = Division::where('id', $auth_user_div_id)->get();
+        //  }else{
+        //     $divisions = Division::get();
+        //  }
+        //  $corpses=Corpse::paginate(5);
+        //  $conditions= Condition::get();
+        //  $manners= Manner::get();
+        //  $anatomies= Anatomy::get();
+        //  $ranks =  Rank::all();
+        // return view('pagination', compact('funeralhomes', 'parishes','stations','conditions','manners','anatomies','divisions','corpses'))->render();
 
    
 
@@ -356,7 +356,7 @@ $this->getExportList();
 //  dd( $sort_by ." ". $sort_type); 
 
  $corpses=null;
- $corpses =  DB::table('corpses')   ->whereIn('id', $corpse_ids)->orderBy($sort_by, $sort_type)->paginate(10);
+ $corpses =  DB::table('corpses')->whereIn('id', $corpse_ids)->orderBy($sort_by, $sort_type)->paginate(10);
      return view('pagination_data', compact('corpses','total_records'))->render();
      }
  

@@ -419,9 +419,10 @@ border-radius: 40px 0px 40px 0px;
                         {!! Form::label('diary_type', 'Diary Type :') !!}<small id="Error_diary_type"></small>
                         <select name="diary_type" class="form-control diary_type" id="diary_type" onchange="diaryType();">
                                 <option value="">Select an Option</option>
-                                <option value="SDR">Sudden Death Register</option>
-                                <option value="SD">Station Diary</option>
                                 <option value="CD">Crime Diary</option>
+                                <option value="SD">Station Diary</option>
+                                <option value="SDR">Sudden Death Register</option>
+                                <option value="TAR">Traffic Accident Register</option>
                             </select>
                     </div>
 
@@ -1108,10 +1109,10 @@ border-radius: 40px 0px 40px 0px;
 
 </div>
 </div>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br>
 </div>
-<script src="{{ asset('corpse/sec2validation.js')}}"></script>
-<script src="{{ asset('corpse/validation.js')}}"></script>
+ 
+<script src="{{ asset('corpse/validation_compress.js')}}"></script>
 
 <script>
 $('.trigger, .slider').click(function( e) {
@@ -1147,12 +1148,8 @@ setTimeout(function() {
 
                   // START
                 $(".io").slideUp();
-                $(".CoprseSection").slideDown();
-                $(".CoprseSection2").slideUp();
-                $(".MorgueSection").slideUp();
-                $(".adminSection").slideUp();
-                $(".confirm").slideUp();
-                $(".adminSection").slideUp();
+                $(".CoprseSection").slideDown();               
+                $(".confirm").slideUp();             
                 $(".cause_of_Death").val('');
 
 
@@ -1461,16 +1458,23 @@ $('#postForm').on('submit', function(event){
 
 
 
-
+  
 
 
 function checkUniqueCrNo() {
+        
 
     var diary_no=$(".diary_no").val();
     var entry_date=$(".entry_date").val();
     var diary_type=$(".diary_type").val();
     var stn_id=$('.corpse_stn_id').val();
-    var urlx =window.location.protocol+"//"+window.location.hostname;
+    var urlx ='';
+  if( window.location.port===''){
+    urlx = window.location.protocol+"//"+window.location.hostname;
+    }else{
+        urlx = window.location.protocol+"//"+window.location.hostname+":"+window.location.port;
+    }
+  
        if (diary_no !=''&& stn_id!=''&& entry_date !='' && diary_type!='' ) {
 
                     $.ajax({

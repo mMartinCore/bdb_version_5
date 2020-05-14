@@ -6,7 +6,7 @@
 <li class="{{ Request::is('corpses*') ? 'active' : '' }}">
     <a href="{!! route('corpses.create') !!}"><i class="fa fa-edit"></i><span> New Corpse </span></a>
 </li>
-<li class="{{ Request::is('corpses*') ? 'active' : '' }}">
+<li style="cursor: pointer; "  class="{{ Request::is('corpses*') ? 'active' : '' }}">
     <a class="hover showRecentActivities"  data-toggle="popover-x" data-target="#myPopover2" data-placement="right"><i class="fa fa-clock-o" aria-hidden="true"></i><span>Recent Activity</span> </a>
  </li>
  @hasrole('SuperAdmin')
@@ -15,11 +15,11 @@
 </li>
 @endrole
 <li class="{{ Request::is('corpses*') ? 'active' : '' }}">
-    <a href="{!! route('corpses.index') !!}"><i class="fa fa-list"></i><span>Corpse Index</span></a>
+    <a class="a" href="{!! route('corpses.index') !!}"><i class="fa fa-list"></i><span>Corpse Index</span></a>
 </li>
 
 <li class="{{ Request::is('corpses*') ? 'active' : '' }}">
-    <a href="{!! route('corpses.notApprove') !!}"><i class="fa fa-list"></i><span>Request Denied</span></a>
+    <a class="a" href="{!! route('corpses.notApprove') !!}"><i class="fa fa-list"></i><span>Request Denied</span></a>
 </li>
 
 

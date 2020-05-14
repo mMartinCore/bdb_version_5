@@ -37,7 +37,8 @@
         }
 
     </style>
-@include('corpses.showModal')
+ 
+ <script src="{{ asset('corpse/deny.js')}}"></script>
 
 <link rel="stylesheet" href="{{asset('dist/task.css')}}">
 
@@ -189,7 +190,7 @@ $excess = 0;
         @endif
         </table>
 
-{!! $corpses->links()  !!}
+{{-- {!! $corpses->links()  !!} --}}
     </div>
 
 {{--
@@ -238,7 +239,6 @@ $excess = 0;
 
 
 
-<script src="{{ asset('corpse/deny.js')}}"></script>
 
 <script>
 

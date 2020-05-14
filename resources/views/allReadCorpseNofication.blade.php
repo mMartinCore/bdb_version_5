@@ -8,8 +8,6 @@
 <div class="container"   style="min-height:800px;">
         <div class="col-lg-10 col-lg-offset-2">
                 <br><br>
-
-
         <div class=" myStyle col-md-8">
             <div class="card">
                     <div class="card-header  " >
@@ -114,7 +112,7 @@
         </div>
     </div>
     </div> <br><br><br>
-    @include('corpses.showModal')
+
 @endsection
 
 

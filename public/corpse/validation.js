@@ -2360,7 +2360,7 @@ function regulationNum() {
                      if (regNo >0) {
 
                                   if (validateRegNum(regNo)) {
-                                    if (regNo.length <=5 && regNo.length >=3)
+                                    if (regNo.length <=6 && regNo.length >=3)
                                     {
                                         $(".regNum").css("border","2px solid green");
                                         $("#Error_regNum").hide();

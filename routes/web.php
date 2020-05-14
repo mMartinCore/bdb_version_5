@@ -9,10 +9,9 @@ use App\Catcommendation;
 Route::group(['middleware' => 'revalidate'], function()
 {
   Route::resource('ranks','RanksController');
-  Route::get('/', 'HomeController@index')->name('home');
+  Route::get('/', 'HomeController@index')->name('home')->middleware('minifiedPage');
   Auth::routes();
     // Routes that you want to revalidate go in here
-
 // Route::get('/create_role_permission',function(){
 //   $role = Role::create(['name' => 'Administer ']);
 //    $permission = Permission::create(['name' => 'Administer roles & permissions']);
@@ -49,15 +48,14 @@ Route::group(['middleware' => 'revalidate'], function()
     Route::resource('corpses', 'CorpseController');
     Route::get('/getCorpse', 'CorpseController@getCorpse');
 
-
     Route::get('/export', 'CorpseController@export');
     Route::get('corpses/export/', 'CorpseController@export');
 
 
-    Route::get('/dash', 'CorpseController@overThirtyDaysStats')->name('dash');
-    Route::get('/dashboard', 'CorpseController@overThirtyDaysStats')->name('dashboard');
+    Route::get('/dash', 'CorpseController@overThirtyDaysStats')->name('dash')->middleware('minifiedPage');
+    Route::get('/dashboard', 'CorpseController@overThirtyDaysStats')->name('dashboard')->middleware('minifiedPage');
 
-    Route::get('/', 'HomeController@overThirtyDaysStats')->name('dashboard');
+    Route::get('/', 'HomeController@overThirtyDaysStats')->name('dashboard')->middleware('minifiedPage');
 
     Route::get('corpses/delete/{id}', 'CorpseController@destroy')->name('corpses.delete');
     Route::GET('/getCorpse', 'CorpseController@getCorpse');
