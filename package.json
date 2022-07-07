@@ -28,7 +28,7 @@
         "install": "^0.13.0",
         "jquery-pjax": "^2.0.1",
         "laravel-echo": "^1.6.1",
-        "moment": "^2.24.0",
+        "moment": "^2.29.4",
         "pusher-js": "^5.0.3",
         "sweetalert2": "^8.15.2"
     }
